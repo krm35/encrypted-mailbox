@@ -1,0 +1,23 @@
+.dark {
+    background: #293742;
+}
+
+.pagination-input {
+    width: 45px;
+    margin-right: 2px;
+    margin-left: 2px;
+    text-align: center;
+}
+
+.centered {
+    z-index: 10;
+    position: absolute;
+    float: left;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.fill {
+    width: 100%;
+}

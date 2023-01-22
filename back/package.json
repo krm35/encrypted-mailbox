@@ -1,0 +1,22 @@
+{
+  "name": "back",
+  "version": "1.0.0",
+  "private": false,
+  "main": "index.js",
+  "scripts": {
+    "dev back": "node hot-reload.js",
+    "start": "node index.js",
+    "audit": "npm audit"
+  },
+  "dependencies": {
+    "dkim": "^0.8.0",
+    "ioredis": "^5.2.4",
+    "mailparser": "^3.6.3",
+    "mongodb": "^3.2.2",
+    "nodemailer-openpgp": "^2.1.0",
+    "openpgp": "5.5.0",
+    "sendmail": "github:krm35/node-sendmail",
+    "smtp-server": "^3.11.0",
+    "uWebSockets.js": "github:uNetworking/uWebSockets.js#v20.15.0"
+  }
+}

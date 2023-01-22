@@ -1,0 +1,9 @@
+.idea
+node_modules
+back/attachments
+!back/attachments/zclear.js
+back/public
+!back/public/.keep
+build
+secrets.json
+.eslintcache
