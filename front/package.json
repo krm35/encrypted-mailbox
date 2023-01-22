@@ -11,7 +11,6 @@
     "file-saver": "^2.0.5",
     "nodemailer": "^6.9.0",
     "nodemailer-openpgp": "^2.1.0",
-    "openpgp": "^5.5.0",
     "path-browserify": "1.0.1",
     "postal-mime": "^1.0.13",
     "react": "^17.0.1",
@@ -23,9 +22,9 @@
     "react-error-overlay": "6.0.9"
   },
   "scripts": {
-    "dev front": "react-scripts --openssl-legacy-provider start",
-    "start": "react-scripts --openssl-legacy-provider start",
-    "build": "react-scripts --openssl-legacy-provider build"
+    "dev front": "react-scripts start",
+    "start": "react-scripts start",
+    "build": "react-scripts build"
   },
   "eslintConfig": {
     "extends": [

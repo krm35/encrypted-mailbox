@@ -1,8 +1,9 @@
 import Toaster from "./Toaster";
 import {FocusStyleManager} from "@blueprintjs/core";
-import {decrypt, readMessage} from "openpgp";
 import PostalMime from "postal-mime";
 import {HTTPClient} from "./HTTPClient";
+
+const {decrypt, readMessage} = window.openpgp;
 
 const keys = {};
 

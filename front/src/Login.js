@@ -4,7 +4,8 @@ import * as Classes from "@blueprintjs/core/lib/cjs/common/classes";
 import {HTTPClient} from "./HTTPClient";
 import {setKey, toast} from "./utilities";
 import {randomBytes} from "crypto";
-import {
+
+const {
     createCleartextMessage,
     createMessage,
     decrypt,
@@ -15,7 +16,7 @@ import {
     readMessage,
     readPrivateKey,
     sign
-} from "openpgp";
+} = window.openpgp;
 
 export default function Login(props) {
 
@@ -122,7 +123,7 @@ export default function Login(props) {
                         />
                     </FormGroup>
                     <FormGroup
-                        label="Credentials"
+                        label="Password"
                         labelFor="password"
                     >
                         <InputGroup
