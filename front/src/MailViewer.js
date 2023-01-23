@@ -2,12 +2,12 @@ import React, {useState} from "react";
 import {Button, Dialog, EditableText, MenuDivider, Spinner, Tag} from "@blueprintjs/core";
 import * as Classes from "@blueprintjs/core/lib/cjs/common/classes";
 import DOMPurify from 'dompurify'
-import {decryptMail} from "./utilities";
+import {decryptMail, replaceAll} from "./utilities";
 import FileSaver from 'file-saver';
 import {detectMimeType} from "./mime-types";
 
 export default function MailViewer(props) {
-    const {mail, setMail} = props;
+    const {mail, setMail, setCompose, tabId} = props;
     const [raw, setRaw] = useState(false);
     decryptMail(mail, setMail, props.tabId.toLowerCase());
     return <Dialog
@@ -32,6 +32,7 @@ export default function MailViewer(props) {
             <br/>
             {!mail.decrypted ? <Spinner/> :
                 <div
+                    id={"decrypted"}
                     dangerouslySetInnerHTML={{
                         __html: DOMPurify.sanitize(raw ? JSON.stringify(mail.decrypted) : mail.textAsHtml)
                     }}
@@ -59,15 +60,26 @@ export default function MailViewer(props) {
                     rightIcon={"application"}
                     onClick={() => setRaw(!raw)}
                 />
-                {/*<Button*/}
-                {/*    outlined={true}*/}
-                {/*    text={"Reply"}*/}
-                {/*    rightIcon={"send-message"}*/}
-                {/*    onClick={() => {*/}
-
-                {/*    }}*/}
-                {/*/>*/}
+                {
+                    tabId === "Mailbox" && <Button
+                        outlined={true}
+                        text={"Reply"}
+                        rightIcon={"send-message"}
+                        onClick={() => {
+                            const decrypted = document.getElementById("decrypted");
+                            if (!decrypted) return;
+                            mail.composeType = "reply";
+                            mail.text = "\n\n" + replyHeader(mail) + "\n>" + (replaceAll(decrypted.innerText, "\n", "\n>"));
+                            setCompose(true);
+                        }}
+                    />
+                }
             </div>
         </div>
     </Dialog>
+}
+
+function replyHeader(mail) {
+    return "------- Original Message -------\n" +
+        "On " + new Date(mail.date).toLocaleString() + ", <" + mail.from.text + "> wrote:";
 }

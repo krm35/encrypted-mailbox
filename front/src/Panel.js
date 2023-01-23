@@ -1,5 +1,5 @@
 import React, {useEffect} from "react";
-import {Button, H1, HTMLTable, Navbar} from "@blueprintjs/core";
+import {Button, H3, HTMLTable, Navbar} from "@blueprintjs/core";
 import Pagination from "./Pagination";
 import MailViewer from "./MailViewer";
 import {HTTPClient} from "./HTTPClient";
@@ -12,7 +12,6 @@ const {useState} = require("react");
 
 export default function Panel() {
 
-    // const [emails] = useEmails();
     const [mail, setMail] = useState(null);
     const [page, setPage] = useState(1);
     const [itemsPerPage] = useState(10);
@@ -56,7 +55,7 @@ export default function Panel() {
         <div>
             <Navbar>
                 <Navbar.Group>
-                    <Navbar.Heading>PGP-SMTP</Navbar.Heading>
+                    <Navbar.Heading><b>PGP-SMTP</b></Navbar.Heading>
                     <Navbar.Divider/>
                     <Button
                         icon="send-message"
@@ -109,7 +108,7 @@ export default function Panel() {
 
             <br/>
 
-            <H1>&nbsp;{tabId}</H1>
+            <H3>&nbsp;{tabId}</H3>
 
             {documents === null ? <Loader/> :
                 <HTMLTable bordered interactive style={{marginTop: "5px", marginBottom: "5px", width: '100%'}}>
@@ -143,7 +142,7 @@ export default function Panel() {
                 lastPage={lastPage}
             />
 
-            {mail && !compose && <MailViewer mail={mail} setMail={setMail} tabId={tabId}/>}
+            {mail && !compose && <MailViewer mail={mail} setMail={setMail} tabId={tabId} setCompose={setCompose}/>}
             {compose && <MailComposer mail={mail} setMail={setMail} setCompose={setCompose}/>}
             {credentials && <Credentials setCredentials={setCredentials}/>}
         </div>

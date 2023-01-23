@@ -36,8 +36,6 @@ router['attachment'] = async (id, json, callback, args) => {
     const {_id, type, index} = json;
     const email = await mongo[0].collection(type || "mailbox").findOne({_id: ObjectId(_id)});
     if (!email || !email.attachments[index]) throw w.INVALID_EMAIL;
-    if (email.from.value[0].address !== id &&
-        !email.from.filter(({address}) => address === id).length) throw w.UNAUTHORIZED_OPERATION;
     const attachment = email.attachments[index];
     const {res, origin} = args;
     const headers = {

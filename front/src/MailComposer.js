@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import {Button, Dialog, EditableText, FileInput, MenuDivider, Tag} from "@blueprintjs/core";
 import * as Classes from "@blueprintjs/core/lib/cjs/common/classes";
 import MailComposer from "nodemailer/lib/mail-composer";
@@ -8,18 +8,41 @@ import {arrayBufferToBuffer, decryptMail, getKey, replaceAll, toast} from "./uti
 import KeyViewer from "./KeyViewer";
 import {detectMimeType} from "./mime-types";
 
+function getSubject(mail) {
+    if (!mail) return "";
+    if (mail.composeType === "reply") return "RE: " + mail.subject;
+}
+
+function getTo(mail) {
+    if (!mail) return [];
+    if (mail.composeType === "reply") return mail.from.text.split(' ');
+    return mail.to.text.split(' ');
+}
+
 export default function MailViewer(props) {
-    const [text, setText] = useState("");
-    const [subject, setSubject] = useState("");
-    const [to, setTo] = useState(props.mail ? props.mail.to.text.split(' ') : []);
+    const [text, setText] = useState(props.mail ? props.mail.text : "");
+    const [subject, setSubject] = useState(getSubject(props.mail));
+    const [to, setTo] = useState(getTo(props.mail));
     const [cc, setCc] = useState([]);
     const [bcc, setBcc] = useState([]);
     const [attachments, setAttachments] = useState([]);
     const [loader, setLoader] = useState(null);
     const [publicKey, setPublicKey] = useState(null);
     const [keyViewerOpen, setKeyViewerOpen] = useState(null);
+    const [focus, setFocus] = useState(null);
 
     if (props.mail) decryptMail(props.mail, props.setMail, "drafts");
+
+    useEffect(() => {
+        setTimeout(() => {
+            if (focus || !props.mail) return;
+            const mailContentDiv = document.getElementById("mail-content");
+            if (mailContentDiv.parentElement.childNodes[0].tagName === "TEXTAREA") {
+                mailContentDiv.parentElement.childNodes[0].setSelectionRange(0, 0);
+                setFocus(true);
+            }
+        }, 0);
+    });
 
     function encrypt(message, encryptionKeys) {
         if (!encryptionKeys) return message;
@@ -122,11 +145,13 @@ export default function MailViewer(props) {
                 )}
                 <br/>
                 <EditableText
+                    contentId={"mail-content"}
                     placeholder="Write your email"
                     multiline={true}
                     minLines={10}
                     value={text}
                     onChange={e => setText(e)}
+                    isEditing={props.mail && props.mail.text !== undefined}
                 />
                 <div style={{marginTop: "3px"}}>
                     {Array.from(attachments).map((a, i) => {
@@ -178,13 +203,13 @@ export default function MailViewer(props) {
                         rightIcon={"shield"}
                         onClick={() => setKeyViewerOpen(true)}
                     />
-                    {props.mail && <Button
-                        outlined={true}
-                        text={"Delete draft"}
-                        loading={loader === "draft"}
-                        rightIcon={"trash"}
-                        onClick={() => deleteDraft()}
-                    />}
+                    {/*{props.mail && <Button*/}
+                    {/*    outlined={true}*/}
+                    {/*    text={"Delete draft"}*/}
+                    {/*    loading={loader === "draft"}*/}
+                    {/*    rightIcon={"trash"}*/}
+                    {/*    onClick={() => deleteDraft()}*/}
+                    {/*/>}*/}
                     {/*<Button*/}
                     {/*    outlined={true}*/}
                     {/*    text={"Save draft"}*/}
