@@ -11,10 +11,11 @@ import {detectMimeType} from "./mime-types";
 function getSubject(mail) {
     if (!mail) return "";
     if (mail.composeType === "reply") return "RE: " + mail.subject;
+    if (mail.composeType === "forward") return "FWD: " + mail.subject;
 }
 
 function getTo(mail) {
-    if (!mail) return [];
+    if (!mail || mail.composeType === "forward") return [];
     if (mail.composeType === "reply") return mail.from.text.split(' ');
     return mail.to.text.split(' ');
 }

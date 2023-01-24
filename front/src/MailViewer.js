@@ -60,26 +60,45 @@ export default function MailViewer(props) {
                     rightIcon={"application"}
                     onClick={() => setRaw(!raw)}
                 />
-                {
-                    tabId === "Mailbox" && <Button
-                        outlined={true}
-                        text={"Reply"}
-                        rightIcon={"send-message"}
-                        onClick={() => {
-                            const decrypted = document.getElementById("decrypted");
-                            if (!decrypted) return;
-                            mail.composeType = "reply";
-                            mail.text = "\n\n" + replyHeader(mail) + "\n>" + (replaceAll(decrypted.innerText, "\n", "\n>"));
-                            setCompose(true);
-                        }}
-                    />
-                }
+                {[[tabId !== "Drafts", "Forward", "nest"], [tabId === "Mailbox", "Reply", "send-message"]]
+                    .map(([shouldPrint, text, rightIcon]) => {
+                        if (!shouldPrint) return null;
+                        return <Button
+                            key={text}
+                            outlined={true}
+                            text={text}
+                            rightIcon={rightIcon}
+                            onClick={() => {
+                                const decrypted = document.getElementById("decrypted");
+                                if (!decrypted) return;
+                                mail.composeType = text.toLowerCase();
+                                addText(mail, decrypted, setCompose);
+                            }}
+                        />
+                    })}
             </div>
         </div>
     </Dialog>
 }
 
+function forwardHeader(mail) {
+    return "------- Forwarded Message -------\n" +
+        "From: <" + mail.from.text + ">\n" +
+        "Date: " + new Date(mail.date).toLocaleString() + "\n" +
+        "Subject: " + mail.subject + "\n" +
+        "To: " + mail.to.text + "\n";
+}
+
 function replyHeader(mail) {
     return "------- Original Message -------\n" +
         "On " + new Date(mail.date).toLocaleString() + ", <" + mail.from.text + "> wrote:";
+}
+
+function header(mail) {
+    return mail.composeType === "reply" ? replyHeader(mail) : forwardHeader(mail);
+}
+
+function addText(mail, decrypted, setCompose) {
+    mail.text = "\n\n" + header(mail) + "\n> " + (replaceAll(decrypted.innerText, "\n", "\n>"));
+    setCompose(true);
 }
