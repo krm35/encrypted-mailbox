@@ -15,13 +15,13 @@ function getSubject(mail) {
 }
 
 function getTo(mail) {
-    if (!mail || mail.composeType === "forward") return [];
+    if (!mail || !mail.to || mail.composeType === "forward") return [];
     if (mail.composeType === "reply") return mail.from.text.split(' ');
     return mail.to.text.split(' ');
 }
 
 export default function MailViewer(props) {
-    const [text, setText] = useState(props.mail ? props.mail.text : "");
+    const [text, setText] = useState(props.mail ? (props.mail.text || "") : "");
     const [subject, setSubject] = useState(getSubject(props.mail));
     const [to, setTo] = useState(getTo(props.mail));
     const [cc, setCc] = useState([]);
@@ -36,8 +36,8 @@ export default function MailViewer(props) {
 
     useEffect(() => {
         setTimeout(() => {
-            if (focus || !props.mail) return;
             const mailContentDiv = document.getElementById("mail-content");
+            if (focus || !props.mail || !mailContentDiv) return;
             if (mailContentDiv.parentElement.childNodes[0].tagName === "TEXTAREA") {
                 mailContentDiv.parentElement.childNodes[0].setSelectionRange(0, 0);
                 setFocus(true);
@@ -61,20 +61,21 @@ export default function MailViewer(props) {
         });
     }
 
-    // function draft() {
-    //     send(true);
-    // }
+    function saveDraft() {
+        send(true);
+    }
 
-    async function deleteDraft() {
-        // try {
-        //     setLoader("delete-draft");
-        //     console.log("delete", props.mail);
-        //     console.log(await HTTPClient.post("/delete-draft?id=" + props.mail._id));
-        // } catch (e) {
-        //     toast("Something went wrong");
-        // } finally {
-        //     setLoader(null);
-        // }
+    async function deleteDraft(stopCompose) {
+        try {
+            setLoader("delete-draft");
+            await HTTPClient.delete("/delete-draft?id=" + props.mail._id)
+        } catch (e) {
+        }
+        setLoader(null);
+        if (stopCompose) {
+            props.setMail(null);
+            props.setCompose(null);
+        }
     }
 
     function send(draft) {
@@ -97,7 +98,12 @@ export default function MailViewer(props) {
                 const signingKey = draft ? getKey("armoredPublicKey") : publicKey;
                 const action = draft ? "draft" : "send";
                 await sendMail(!signingKey ? message : await encrypt(message, [signingKey]), action);
+                if (draft && props.mail) await deleteDraft();
+                if (publicKey && !draft) {
+                    await sendMail(await encrypt(message, [getKey("armoredPublicKey")]), "copy");
+                }
             } catch (e) {
+                console.log(e);
                 toast("Something went wrong");
                 setLoader(null);
             }
@@ -105,17 +111,16 @@ export default function MailViewer(props) {
     }
 
     async function sendMail(message, action) {
-        await deleteDraft();
         HTTPClient.post("/upload?action=" + action, message)
             .then(res => {
                 const {error, data} = res.data;
-                console.log(error, res, data);
                 if (props.setMail) props.setMail(null);
                 props.setCompose(null);
+                if (error) return toast(data);
                 toast(action === "draft" ? "Draft saved" : "Email sent", "success");
             })
-            .catch(() => {
-                console.log("error");
+            .catch((e) => {
+                console.log("error", e);
                 toast("Something went wrong");
                 setLoader(null);
             })
@@ -204,20 +209,20 @@ export default function MailViewer(props) {
                         rightIcon={"shield"}
                         onClick={() => setKeyViewerOpen(true)}
                     />
-                    {/*{props.mail && <Button*/}
-                    {/*    outlined={true}*/}
-                    {/*    text={"Delete draft"}*/}
-                    {/*    loading={loader === "draft"}*/}
-                    {/*    rightIcon={"trash"}*/}
-                    {/*    onClick={() => deleteDraft()}*/}
-                    {/*/>}*/}
-                    {/*<Button*/}
-                    {/*    outlined={true}*/}
-                    {/*    text={"Save draft"}*/}
-                    {/*    loading={loader === "draft"}*/}
-                    {/*    rightIcon={"floppy-disk"}*/}
-                    {/*    onClick={() => draft()}*/}
-                    {/*/>*/}
+                    {props.mail && <Button
+                        outlined={true}
+                        text={"Delete draft"}
+                        loading={loader === "draft"}
+                        rightIcon={"trash"}
+                        onClick={() => deleteDraft(true)}
+                    />}
+                    <Button
+                        outlined={true}
+                        text={"Save draft"}
+                        loading={loader === "draft"}
+                        rightIcon={"floppy-disk"}
+                        onClick={() => saveDraft()}
+                    />
                     <Button
                         outlined={true}
                         text={"Send"}

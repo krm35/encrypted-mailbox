@@ -51,16 +51,20 @@ let error, data;
     /*******send to myself encrypted******/
     data = compose(email, [email]);
     await httpPost('/upload?action=send', session, false, null, await encryptMail(await build(data), [publicKey]));
+    await httpPost('/upload?action=copy', session, false, null, await encryptMail(await build(data), [publicKey]));
     await wait(200);
     for (const collection of ['mailbox', 'sent']) {
         data = await mongo[0].collection(collection).find({'headers.from.value.address': email}).toArray();
         strictEqual(data.length, 2);
-        // strictEqual(data[1].attachments.length, 2);
-        strictEqual(data[1].attachments.length, 1);
+        const size = collection === 'sent' ? 1 : 2;
+        strictEqual(data[1].attachments.length, size);
         strictEqual(typeof data[1].attachments[0].content, "string");
-        // strictEqual(data[1].attachments[0].contentType, "application/pgp-encrypted");
-        // strictEqual(data[1].attachments[1].contentType, "application/octet-stream");
-        strictEqual(data[1].attachments[0].contentType, "application/octet-stream");
+        if (collection === 'sent') {
+            strictEqual(data[1].attachments[0].contentType, "application/octet-stream");
+        } else {
+            strictEqual(data[1].attachments[0].contentType, "application/pgp-encrypted");
+            strictEqual(data[1].attachments[1].contentType, "application/octet-stream");
+        }
     }
     await checkMails('/mailbox', 2, session);
     await checkMails('/sent', 2, session);
@@ -90,6 +94,7 @@ let error, data;
 
     /*******send to a friend encrypted******/
     data = compose(email, [friend]);
+    await httpPost('/upload?action=copy', session, false, null, await encryptMail(await build(data), [publicKey]));
     await httpPost('/upload?action=send', session, false, null, await encryptMail(await build(data), [publicKey]));
     await wait(250);
     data = await mongo[0].collection('sent').find({'headers.to.value.address': friend}).toArray();

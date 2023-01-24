@@ -4,7 +4,7 @@ const {ObjectId} = require('mongodb'),
     w = require('../words'),
     redis = require('../redis'),
     mongo = require('../mongo'),
-    {saveAttachments, getDocuments, encryptMail, parseMail, sendMail, isEncrypted, event, Utf8ArrayToStr} = require('../utilities/commons'),
+    {saveAttachments, getDocuments, encryptMail, parseMail, sendMail, isEncrypted, event, buildMessageFromBuffer} = require('../utilities/commons'),
     cors = require('../utilities/cors'),
     {sendAttachment} = require("../utilities/download");
 
@@ -17,18 +17,18 @@ router['sent'] = async (id, json, callback) => {
 };
 
 router['send'] = async (id, json, callback) => {
-    let message = "";
-    json.buffer.forEach(b => {
-        if (b.length) message += Utf8ArrayToStr(b)
-    });
+    const message = buildMessageFromBuffer(json);
     const parsed = await parseMail(message);
     if (!parsed || parsed.from.value.length > 1 || parsed.from.value[0].address !== id) throw w.UNAUTHORIZED_OPERATION;
-    const encryptedMessage = isEncrypted(parsed) ? parsed : await parseMail(await encryptMail(message, [await redis.get(id + "publicKey")]));
+    const encrypted = isEncrypted(parsed);
+    const encryptedMessage = encrypted ? parsed : await parseMail(await encryptMail(message, [await redis.get(id + "publicKey")]));
     const {to, subject, html, attachments} = parsed;
-    saveAttachments(encryptedMessage);
+    if (!encrypted) saveAttachments(encryptedMessage);
     await sendMail({from: id, to: to.text, subject, html, attachments});
-    await mongo[0].collection('sent').insertOne(encryptedMessage);
-    event(id, 'Sent', encryptedMessage);
+    if (!encrypted) {
+        await mongo[0].collection('sent').insertOne(encryptedMessage);
+        event(id, 'Sent', encryptedMessage);
+    }
     callback(false);
 };
 
@@ -47,6 +47,5 @@ router['attachment'] = async (id, json, callback, args) => {
     for (let i in headers) res.writeHeader(i, "" + headers[i]);
     res["headerWritten"] = true;
     sendAttachment(res, co.__dirname + attachment.content);
-    // res.write(fs.readFileSync(co.__dirname + attachment.content));
     callback();
 };

@@ -50,6 +50,14 @@ module.exports.sendMail = (message) => {
     });
 };
 
+module.exports.buildMessageFromBuffer = (json) => {
+    let message = "";
+    json.buffer.forEach(b => {
+        if (b.length) message += Utf8ArrayToStr(b)
+    });
+    return message;
+};
+
 module.exports.saveAttachments = (parsed) => {
     const {attachments} = parsed;
     if (attachments && Array.isArray(attachments) && attachments.length) {
@@ -72,7 +80,7 @@ module.exports.deleteMail = async (id, json, callback, collection, type, eventTy
     event(id, eventType, draft);
 };
 
-module.exports.Utf8ArrayToStr = (array) => {
+const Utf8ArrayToStr = (array) => {
     let out, i, len, c, char2, char3;
     out = "";
     len = array.length;

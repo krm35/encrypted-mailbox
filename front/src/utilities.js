@@ -50,7 +50,8 @@ export function decryptMail(mail, setMail, type) {
         });
 }
 
-export function initWS(newDoc) {
+export function initWS() {
+    if (window.ws) return;
     const ws = new WebSocket(
         window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1" ?
             'ws://localhost:8080/' :
@@ -66,7 +67,7 @@ export function initWS(newDoc) {
             const json = JSON.parse(e.data);
             if (!json.hb) {
                 console.log(json);
-                newDoc(json);
+                window.newDoc(json);
             }
         } catch (e) {
             console.log(e);
@@ -77,7 +78,8 @@ export function initWS(newDoc) {
     };
 
     ws.onclose = function () {
-        setTimeout(initWS, 5000, newDoc);
+        delete window.ws;
+        setTimeout(initWS, 5000);
     };
 
     window.ws = ws;

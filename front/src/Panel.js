@@ -1,4 +1,4 @@
-import React, {useEffect} from "react";
+import React, {useEffect, useState} from "react";
 import {Button, H3, HTMLTable, Navbar} from "@blueprintjs/core";
 import Pagination from "./Pagination";
 import MailViewer from "./MailViewer";
@@ -7,8 +7,6 @@ import Loader from "./Loader";
 import MailComposer from "./MailComposer";
 import Credentials from "./Credentials";
 import {initWS, updateTheme} from "./utilities";
-
-const {useState} = require("react");
 
 export default function Panel() {
 
@@ -23,9 +21,10 @@ export default function Panel() {
     const [credentials, setCredentials] = useState(null);
     const [theme, setTheme] = useState(localStorage['smtp-theme']);
 
-    const newDoc = (json) => {
+    window.newDoc = (json) => {
         if (json[1].deleted) {
-            setDocuments(window.documents.filter(d => d._id !== json[1]._id));
+            window.documents = window.documents.filter(d => d._id !== json[1]._id);
+            setDocuments(window.documents);
         } else {
             if (json[0] === tabId && page === 1) {
                 setDocuments([json[1]].concat(window.documents));
@@ -33,7 +32,7 @@ export default function Panel() {
         }
     };
 
-    useEffect(() => initWS(newDoc), []);
+    useEffect(() => initWS(), []);
 
     useEffect(() => {
         setDocuments(null);
@@ -43,7 +42,6 @@ export default function Panel() {
                 if (error) {
                     return;
                 }
-                // console.log(data['documents']);
                 window.documents = data['documents'];
                 setDocuments(data['documents']);
                 setLastPage(Math.ceil(data['count'] / itemsPerPage));
@@ -75,12 +73,12 @@ export default function Panel() {
                         text="Sent"
                         onClick={() => setTabId("Sent")}
                     />
-                    {/*<Button*/}
-                    {/*    minimal={tabId === "Drafts"}*/}
-                    {/*    icon="unarchive"*/}
-                    {/*    text="Drafts"*/}
-                    {/*    onClick={() => setTabId("Drafts")}*/}
-                    {/*/>*/}
+                    <Button
+                        minimal={tabId === "Drafts"}
+                        icon="unarchive"
+                        text="Drafts"
+                        onClick={() => setTabId("Drafts")}
+                    />
                     {/*<Button*/}
                     {/*    minimal={tabId === "Archive"}*/}
                     {/*    icon="projects"*/}
@@ -120,16 +118,20 @@ export default function Panel() {
                     </tr>
                     </thead>
                     <tbody>
-                    {documents.map(doc =>
-                        <tr key={doc._id}
-                            onClick={() => {
-                                if (tabId === "Drafts") setCompose(true);
-                                setMail(doc);
-                            }}>
-                            <td>{doc[tabId === "Mailbox" ? "from" : "to"].text}</td>
-                            <td>{doc.subject}</td>
-                            <td>{new Date(doc.t).toLocaleString('fr')}</td>
-                        </tr>
+                    {documents.map(doc => {
+                            const type = tabId === "Mailbox" ? "from" : "to";
+                            const text = !doc[type] ? "" : doc[type].text;
+                            return (
+                                <tr key={doc._id}
+                                    onClick={() => {
+                                        if (tabId === "Drafts") setCompose(true);
+                                        setMail(doc);
+                                    }}>
+                                    <td>{text}</td>
+                                    <td>{doc.subject}</td>
+                                    <td>{new Date(doc.t).toLocaleString('fr')}</td>
+                                </tr>)
+                        }
                     )}
                     </tbody>
                 </HTMLTable>}
