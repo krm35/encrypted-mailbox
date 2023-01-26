@@ -66,7 +66,7 @@ export default function Credentials(props) {
                 <Button
                     outlined={true}
                     fill={true}
-                    onClick={() => save(getKey("armoredPublicKey"), "pgp-public.pem")}
+                    onClick={() => save(getKey("armoredPublicKey"), "public.asc")}
                 >
                     Export public key
                 </Button>
@@ -78,7 +78,7 @@ export default function Credentials(props) {
                         try {
                             if (!password || !password.length) return toast("INVALID CURRENT PASSWORD");
                             await checkPassword();
-                            save(getKey('privateKey').armor(), "pgp-private.pem")
+                            save(getKey('privateKey').armor(), "private.asc")
                         } catch (e) {
                             toast("INVALID CURRENT PASSWORD");
                         }

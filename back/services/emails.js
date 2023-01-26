@@ -4,7 +4,7 @@ const {ObjectId} = require('mongodb'),
     w = require('../words'),
     redis = require('../redis'),
     mongo = require('../mongo'),
-    {saveAttachments, getDocuments, encryptMail, parseMail, sendMail, isEncrypted, event, buildMessageFromBuffer} = require('../utilities/commons'),
+    {saveAttachments, getDocuments, encryptMail, parseMail, sendMail, isEncrypted, event, buildMessageFromBuffer, deleteMail} = require('../utilities/commons'),
     cors = require('../utilities/cors'),
     {sendAttachment} = require("../utilities/download");
 
@@ -29,7 +29,8 @@ router['send'] = async (id, json, callback) => {
         await mongo[0].collection('sent').insertOne(encryptedMessage);
         event(id, 'Sent', encryptedMessage);
     }
-    callback(false);
+    if (json.id) await deleteMail(id, json, callback, 'drafts', 'from', 'Drafts');
+    else callback(false);
 };
 
 router['attachment'] = async (id, json, callback, args) => {

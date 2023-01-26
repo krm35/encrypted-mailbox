@@ -28,7 +28,7 @@ export function replaceAll(str, find, replace) {
     return str.split(find).join(replace);
 }
 
-export function decryptMail(mail, setMail, type) {
+export function decryptMail(mail, setMail, type, setText, setAttachments) {
     if (!mail || mail.decrypted) return;
     HTTPClient.get("/attachment?_id=" + mail._id + "&index=0&type=" + type)
         .then(async ({data}) => {
@@ -40,7 +40,15 @@ export function decryptMail(mail, setMail, type) {
                 });
                 const parser = new PostalMime();
                 const email = await parser.parse(decrypted.replace(' \n\n ', '\n\n'));
-                setMail({...mail, textAsHtml: email.html, attachments: email.attachments, decrypted})
+                setMail({...mail, textAsHtml: email.html, attachments: email.attachments, decrypted});
+                if (setText) setText(email.html);
+                if (setAttachments) {
+                    email.attachments.forEach(a => {
+                        a.contentType = a.mimeType;
+                        a.content = arrayBufferToBuffer(a.content);
+                    });
+                    setAttachments(email.attachments);
+                }
             } catch (e) {
                 console.log(e);
             }

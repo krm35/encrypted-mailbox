@@ -8,7 +8,6 @@ router['copy'] = async (id, json, callback, args) => {
     const parsed = await parseMail(buildMessageFromBuffer(json));
     if (!isEncrypted(parsed) || parsed.from.value.length > 1 || parsed.from.value[0].address !== id) throw w.UNAUTHORIZED_OPERATION;
     saveAttachments(parsed);
-    console.log(parsed.attachments.length);
     await mongo[0].collection(type.toLowerCase()).insertOne(parsed);
     event(id, type, parsed);
     callback(false)

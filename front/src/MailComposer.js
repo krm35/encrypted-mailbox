@@ -26,13 +26,13 @@ export default function MailViewer(props) {
     const [to, setTo] = useState(getTo(props.mail));
     const [cc, setCc] = useState([]);
     const [bcc, setBcc] = useState([]);
-    const [attachments, setAttachments] = useState([]);
+    const [attachments, setAttachments] = useState(props.mail ? props.mail.attachments : []);
     const [loader, setLoader] = useState(null);
     const [publicKey, setPublicKey] = useState(null);
     const [keyViewerOpen, setKeyViewerOpen] = useState(null);
     const [focus, setFocus] = useState(null);
 
-    if (props.mail) decryptMail(props.mail, props.setMail, "drafts");
+    if (props.mail) decryptMail(props.mail, props.setMail, "drafts", setText, setAttachments);
 
     useEffect(() => {
         setTimeout(() => {
@@ -65,16 +65,14 @@ export default function MailViewer(props) {
         send(true);
     }
 
-    async function deleteDraft(stopCompose) {
+    async function deleteDraft() {
         try {
             setLoader("delete-draft");
-            await HTTPClient.delete("/delete-draft?id=" + props.mail._id)
-        } catch (e) {
-        }
-        setLoader(null);
-        if (stopCompose) {
+            await HTTPClient.delete("/delete-draft?id=" + props.mail._id);
+            setLoader(null);
             props.setMail(null);
             props.setCompose(null);
+        } catch (e) {
         }
     }
 
@@ -86,19 +84,19 @@ export default function MailViewer(props) {
             cc,
             bcc,
             subject,
-            html: replaceAll(text, "\n", "<br/>"),
+            html: draft ? text : replaceAll(text, "\n", "<br/>"),
             attachments: Array.from(attachments).filter(a => a.valid !== null)
         });
         mail['compile']()['build'](async (err, message) => {
             if (err) {
+                console.log(err);
                 toast("Something went wrong");
                 return setLoader(null);
             }
             try {
                 const signingKey = draft ? getKey("armoredPublicKey") : publicKey;
-                const action = draft ? "draft" : "send";
+                const action = draft ? "draft" : ("send" + (props.mail ? "&id=" + props.mail._id : ""));
                 await sendMail(!signingKey ? message : await encrypt(message, [signingKey]), action);
-                if (draft && props.mail) await deleteDraft();
                 if (publicKey && !draft) {
                     await sendMail(await encrypt(message, [getKey("armoredPublicKey")]), "copy");
                 }
@@ -170,7 +168,7 @@ export default function MailViewer(props) {
                                 attachments[i].valid = null;
                                 setAttachments([...attachments]);
                             }}
-                        >{a.name}</Tag>;
+                        >{a.filename}</Tag>;
                     })}
                 </div>
                 <div style={{display: "none"}}>
@@ -203,6 +201,20 @@ export default function MailViewer(props) {
                         rightIcon={"paperclip"}
                         onClick={() => document.getElementById("attachments").click()}
                     />
+                    {!attachments.filter(a => a.valid !== null && a.filename === "public.asc").length && <Button
+                        outlined={true}
+                        text={"Attach public key"}
+                        rightIcon={"key"}
+                        onClick={() => {
+                            const filename = "public.asc";
+                            attachments.push({
+                                filename,
+                                content: new TextEncoder().encode(getKey("armoredPublicKey")),
+                                contentType: detectMimeType(filename)
+                            });
+                            setAttachments([...attachments]);
+                        }}
+                    />}
                     <Button
                         outlined={true}
                         text={"PGP Encrypt"}
@@ -214,7 +226,7 @@ export default function MailViewer(props) {
                         text={"Delete draft"}
                         loading={loader === "draft"}
                         rightIcon={"trash"}
-                        onClick={() => deleteDraft(true)}
+                        onClick={() => deleteDraft()}
                     />}
                     <Button
                         outlined={true}
