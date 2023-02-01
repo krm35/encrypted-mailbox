@@ -16,8 +16,8 @@ router['sent'] = async (id, json, callback) => {
     await getDocuments(id, json, "sent", callback, {'headers.from.value.address': id});
 };
 
-router['send'] = async (id, json, callback) => {
-    const message = buildMessageFromBuffer(json);
+router['send'] = async (id, json, callback, args) => {
+    const message = args.message || buildMessageFromBuffer(json);
     const parsed = await parseMail(message);
     if (!parsed || parsed.from.value.length > 1 || parsed.from.value[0].address !== id) throw w.UNAUTHORIZED_OPERATION;
     const encrypted = isEncrypted(parsed);
