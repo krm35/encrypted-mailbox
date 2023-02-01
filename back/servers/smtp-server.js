@@ -13,12 +13,23 @@ setTimeout(async function () {
     }, {});
 }, 1000);
 
+let sslConfig = {};
+if (c.ssl) {
+    sslConfig = {
+        secure: true,
+        key_file_name: fs.readFileSync(c.sslKey),
+        cert_file_name: fs.readFileSync(c.sslCert),
+    };
+} else if (c.sslSmtp) {
+    sslConfig = {
+        secure: true,
+        key_file_name: fs.readFileSync(c.sslKeySmtp),
+        cert_file_name: fs.readFileSync(c.sslCertSmtp),
+    };
+}
+
 const server = new SMTPServer({
-    ...(!c.ssl ? {} : {
-        secure: c.ssl,
-        key: fs.readFileSync(c.sslKey),
-        cert: fs.readFileSync(c.sslCert),
-    }),
+    sslConfig,
     onData(stream, session, callback) {
         if (!stream.buffers) stream.buffers = [];
         stream.on('data', d => stream.buffers.push(d));

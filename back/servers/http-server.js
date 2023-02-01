@@ -19,13 +19,22 @@ function sendFile(res, fileName) {
         .end(router['files'][fileName]);
 }
 
-uws['App']({
-    ...(!c.ssl ? {} : {
-        secure: c.ssl,
+let sslConfig = {};
+if (c.ssl) {
+    sslConfig = {
+        secure: true,
         key_file_name: fs.readFileSync(c.sslKey),
         cert_file_name: fs.readFileSync(c.sslCert),
-    })
-}).ws('/*', {
+    };
+} else if (c.sslHttp) {
+    sslConfig = {
+        secure: true,
+        key_file_name: fs.readFileSync(c.sslKeyHttp),
+        cert_file_name: fs.readFileSync(c.sslCertHttp),
+    };
+}
+
+uws['App'](sslConfig).ws('/*', {
     upgrade: async (res, req, context) => {
         res.onAborted(() => {
             res.aborted = true;

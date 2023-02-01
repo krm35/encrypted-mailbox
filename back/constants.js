@@ -2,12 +2,18 @@ const fs = require('fs'),
     secret = __dirname + "/secrets.json",
     map = {};
 
-map.__dirname = __dirname + "/attachments/";
+map.attachments = __dirname + "/attachments/";
 map.domain = "@localhost.com";
 map.host = "127.0.0.1";
 map.ssl = false;
 map.sslKey = "";
 map.sslCert = "";
+map.sslHttp = false;
+map.sslKeyHttp = "";
+map.sslCertHttp = "";
+map.sslSmtp = false;
+map.sslKeySmtp = "";
+map.sslCertSmtp = "";
 map.smtpPort = 2525;
 map.httpPort = 8080;
 map.sendmailConf = {
@@ -33,5 +39,10 @@ if (map.sendmailConf.dkim) {
         delete map.sendmailConf.dkim;
     }
 }
+
+map.__dirname = map.attachments;
+
+
+if (!fs.existsSync(map.__dirname)) fs.mkdirSync(map.__dirname);
 
 module.exports = map;

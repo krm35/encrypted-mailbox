@@ -35,8 +35,15 @@ _Create a secrets.json file in the back directory_
   "smtpPort": 25,
   "httpPort": 443,
   "ssl": true,
-  "sslKey": "path to key if ssl",
-  "sslCert": "path to cert if ssl"
+  "sslKey": "path to key for both servers",
+  "sslCert": "path to cert for both servers",
+  "sslHttp": true,
+  "sslKeyHttp": "path to key if ssl for http",
+  "sslCertHttp": "path to cert if ssl for http",
+  "sslSmtp": true,
+  "sslKeySmtp": "path to key if ssl for smtp",
+  "sslCertSmtp": "path to cert if ssl for smtp",
+  "attachments": "optional - path to the attachments directory"
 }
 ```
 
