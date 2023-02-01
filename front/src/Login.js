@@ -1,4 +1,4 @@
-import React, {useState} from "react";
+import React, {useEffect, useState} from "react";
 import {Button, Dialog, FormGroup, InputGroup} from "@blueprintjs/core";
 import * as Classes from "@blueprintjs/core/lib/cjs/common/classes";
 import {HTTPClient} from "./HTTPClient";
@@ -20,19 +20,23 @@ const {
 
 export default function Login(props) {
 
-    // const [email, setEmail] = useState("admin@localhost.com");
-    // const [password, setPassword] = useState("super long and hard to guess secret");
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
-
-    // if ("localhost" === window.location.hostname) {
-    //     setTimeout(function () {
-    //         const signInButton = document.getElementById("sign-in");
-    //         if (signInButton) signInButton.click();
-    //     }, 10);
-    // }
+    const [loader, setLoader] = useState(null);
+    
+    useEffect(() => {
+        setTimeout(function () {
+            try {
+                if (!document.getElementById("password").value.length) return;
+                const signInButton = document.getElementById("sign-in");
+                if (signInButton) signInButton.click();
+            } catch (e) {
+            }
+        }, 1000);
+    }, []);
 
     async function signUp() {
+        setLoader(true);
         const passphrase = randomBytes(64).toString('hex');
         const {privateKey, publicKey} = await generateKey({
             type: 'rsa',
@@ -52,6 +56,7 @@ export default function Login(props) {
                 props.setConnected(true);
             }).catch(() => {
             toast("Something went wrong :(");
+            setLoader(false);
         });
     }
 
@@ -76,14 +81,19 @@ export default function Login(props) {
                 props.setConnected(true);
             }).catch(() => {
             toast("Something went wrong :(");
+            setLoader(false);
         });
     }
 
     function signIn() {
+        setLoader(true);
         HTTPClient.post('/signin', {email})
             .then(async (result) => {
                 const {error, data} = result.data;
-                if (error) return toast(data);
+                if (error) {
+                    setLoader(false);
+                    return toast(data);
+                }
                 try {
                     const {data: passphrase} = await decrypt({
                         message: await readMessage({armoredMessage: data['encryptedPassphrase']}),
@@ -103,6 +113,7 @@ export default function Login(props) {
                     toast("INVALID PASSWORD");
                 }
             }).catch(() => {
+            setLoader(false);
             toast("Something went wrong :(");
         });
     }
@@ -136,6 +147,7 @@ export default function Login(props) {
                 </form>
                 <div style={{width: "80%", display: "flex", margin: "0 auto"}}>
                     <Button
+                        loading={loader}
                         id={"sign-in"}
                         outlined={true}
                         fill={true}
@@ -145,6 +157,7 @@ export default function Login(props) {
                     </Button>
                     &nbsp;&nbsp;
                     <Button
+                        loading={loader}
                         outlined={true}
                         fill={true}
                         onClick={() => signUp().catch(() => {
