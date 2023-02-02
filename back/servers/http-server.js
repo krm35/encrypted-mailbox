@@ -119,10 +119,10 @@ async function getUser(req) {
 async function handleRequest(req, res, method, url, origin, body) {
     try {
         const user = !router['noUserCheck'][url] ? (await getUser(req)) : {};
-        if (!router['noUserCheck'][url] && (!user || !user['id'])) {
+        if (!router['noUserCheck'][url] && (!user || !user['email'])) {
             return answer(req, res, origin, true, w.UNAUTHORIZED_OPERATION);
         }
-        router[url](user['id'], body, (error, data) => {
+        router[url](user['email'], body, (error, data) => {
                 answer(req, res, origin, error, data)
             }, {req, res, url, origin, admin: user['admin']}
         ).catch((e) => {

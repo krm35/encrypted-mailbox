@@ -37,8 +37,7 @@ const isConnected = function isConnected(cookie, callback) {
         if (err || !user) {
             callback(null);
         } else {
-            const {email, admin} = JSON.parse(user);
-            callback({id: email, admin});
+            callback(JSON.parse(user));
         }
     });
 };
