@@ -43,7 +43,8 @@ _Create a secrets.json file in the back directory_
   "sslSmtp": true,
   "sslKeySmtp": "path to key if ssl for smtp",
   "sslCertSmtp": "path to cert if ssl for smtp",
-  "attachments": "optional - path to the attachments directory"
+  "attachments": "optional - path to the attachments directory",
+  "allowNonAdminSignUp": "boolean true by default -> anyone can sign up"
 }
 ```
 

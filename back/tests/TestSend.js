@@ -21,7 +21,7 @@ let error, data;
     await redis.set(email + "publicKey", publicKey);
     await mongo[0].collection('users').insertOne({email, publicKey});
     const session = crypto.randomBytes(128).toString('hex');
-    await redis.set("session" + session, email);
+    await redis.set("session" + session, JSON.stringify({email}));
 
     ({error} = await httpPost('/upload?action=send', session, false, null, "test"));
     strictEqual(error, true);
@@ -116,7 +116,7 @@ let error, data;
     const friends = ["friend1" + Date.now() + c.domain, "friend2" + Date.now() + c.domain];
     for (const f of friends) {
         await redis.set(f + "publicKey", publicKey);
-        await redis.set("session" + f, f);
+        await redis.set("session" + f, JSON.stringify({email: f}));
     }
     data = compose(email, friends);
     await httpPost('/upload?action=send', session, false, null, await build(data));

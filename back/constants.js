@@ -25,6 +25,7 @@ map.sendmailConf = {
 map.redisConf = {
     port: 6379
 };
+map.allowNonAdminSignUp = true;
 map.isDev = !fs.existsSync(secret);
 
 if (!map.isDev) {
@@ -41,7 +42,6 @@ if (map.sendmailConf.dkim) {
 }
 
 map.__dirname = map.attachments;
-
 
 if (!fs.existsSync(map.__dirname)) fs.mkdirSync(map.__dirname);
 

@@ -19,7 +19,7 @@ let error, data;
     await redis.set(email + "publicKey", publicKey);
     const session = crypto.randomBytes(128).toString('hex');
     await waitMongo(mongo);
-    await redis.set("session" + session, email);
+    await redis.set("session" + session, JSON.stringify({email}));
     await mongo[0].collection('users').insertOne({email, publicKey});
 
     ({error} = await httpPost('/upload?action=draft', session, false, null, "test"));
@@ -45,7 +45,7 @@ let error, data;
 
     await checkMails('/drafts', 1, session);
 
-    await redis.set("session" + session + "2", "othermail" + c.domain);
+    await redis.set("session" + session + "2", JSON.stringify({email: "othermail" + c.domain}));
 
     ({error, data} = await httpGet('/delete-draft' + query({id}), session + "2"));
     strictEqual(error, true);

@@ -33,11 +33,12 @@ const isConnectedAsync = function isConnectedAsync(cookie) {
 const isConnected = function isConnected(cookie, callback) {
     const session = getSessionCookie(cookie);
     if (!session) return callback(null);
-    redis.get("session" + session, function (err, id) {
-        if (err || !id) {
+    redis.get("session" + session, function (err, user) {
+        if (err || !user) {
             callback(null);
         } else {
-            callback({id, isAdmin: false});
+            const {email, admin} = JSON.parse(user);
+            callback({id: email, admin});
         }
     });
 };

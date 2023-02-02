@@ -4,20 +4,30 @@ const mongo = require('../mongo'),
     {getDocuments} = require('../utilities/commons');
 
 router['admin'] = async (id, json, callback, args) => {
-    isAdmin(args);
+    isAdmin(id, args.admin);
+    const {route} = json;
+    await adminRoutes[route](id, json, callback, args);
+};
+
+const adminRoutes = {};
+
+adminRoutes['users'] = async (id, json, callback) => {
+    await getDocuments(id, json, "users", callback);
+};
+
+adminRoutes['update'] = async (id, json, callback) => {
     const {email, admin} = json;
-    if (admin !== true && isDefaultAdmin(email)) throw w.UNAUTHORIZED_OPERATION;
     await mongo[0].collection("users").updateOne({email}, {$set: {admin: admin === true}});
     callback(false);
 };
 
-router['users'] = async (id, json, callback, args) => {
-    isAdmin(args);
-    await getDocuments(id, json, "users", callback);
+adminRoutes['signup'] = async (id, json, callback, args) => {
+    await router['signup'](id, json, callback, {...args, skipCookie: false});
 };
 
-function isAdmin({isAdmin}) {
-    if (!isAdmin) throw w.UNAUTHORIZED_OPERATION;
+function isAdmin(email, admin) {
+    if (isDefaultAdmin(email)) return true;
+    if (!admin) throw w.UNAUTHORIZED_OPERATION;
 }
 
 function isDefaultAdmin(email) {

@@ -124,7 +124,7 @@ async function handleRequest(req, res, method, url, origin, body) {
         }
         router[url](user['id'], body, (error, data) => {
                 answer(req, res, origin, error, data)
-            }, {req, res, url, origin}
+            }, {req, res, url, origin, admin: user['admin']}
         ).catch((e) => {
             if (!w[e] && c.isDev) console.log(e);
             answer(req, res, origin, true, w[e] || w.UNKNOWN_ERROR);

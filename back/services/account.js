@@ -2,6 +2,7 @@ const crypto = require('crypto'),
     openpgp = require('openpgp'),
     mongo = require('../mongo'),
     w = require('../words'),
+    c = require('../constants'),
     router = require('../router'),
     redis = require('../redis'),
     {getSessionCookie} = require('../utilities/checkClient');
@@ -11,6 +12,7 @@ router['noUserCheck']['signin'] = true;
 router['noUserCheck']['signup'] = true;
 
 router['signup'] = async (id, json, callback, args) => {
+    if (!c.allowNonAdminSignUp && !args.admin) throw w.UNAUTHORIZED_OPERATION;
     let {email, privateKey, publicKey, encryptedPassphrase} = json;
     if (!email || !validateEmail(email) || email.length > 200) throw w.INVALID_EMAIL;
     email = email.toLowerCase();
@@ -19,7 +21,8 @@ router['signup'] = async (id, json, callback, args) => {
     await openpgp.readMessage({armoredMessage: encryptedPassphrase});
     await mongo[0].collection('users').insertOne({email, privateKey, publicKey, encryptedPassphrase}, async (err) => {
         if (err) return callback(true, err.code === 11000 ? w.EMAIL_TAKEN : w.UNKNOWN_ERROR);
-        await generateCookie(email, callback, args);
+        if (args.skipCookie) return callback(false, email);
+        await generateCookie({email}, callback, args);
     });
 };
 
@@ -36,10 +39,10 @@ router['signin'] = async (id, json, callback) => {
 
 router['sign'] = async (id, json, callback, args) => {
     const {token, text} = json;
-    const {email, publicKey} = JSON.parse(await redis.get("session" + token));
+    const {email, publicKey, admin} = JSON.parse(await redis.get("session" + token));
     await checkSignature(text, publicKey);
     await redis.set(email + "publicKey", publicKey);
-    await generateCookie(email, callback, args);
+    await generateCookie({email, admin}, callback, args);
 };
 
 router['logout'] = async (id, json, callback, args) => {
@@ -82,9 +85,9 @@ function validateEmail(email) {
     return re.test(String(email).toLowerCase());
 }
 
-async function generateCookie(email, callback, args) {
+async function generateCookie(user, callback, args) {
     const session = crypto.randomBytes(128).toString('hex');
-    await redis.set("session" + session, email);
+    await redis.set("session" + session, JSON.stringify(user));
     args.res['headerWritten'] = {
         "Set-Cookie": "session=" + session + "; HttpOnly; path=/; SameSite=Strict; Secure;"
     };
