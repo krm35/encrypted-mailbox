@@ -2,7 +2,7 @@ const http = require('http'),
     crypto = require("crypto"),
     {strictEqual} = require('assert'),
     querystring = require('querystring'),
-    MailComposer = require("nodemailer/lib/mail-composer");
+    {compose, build} = require("../utilities/commons");
 
 const httpRequest = function (path, session, dontParse, headers, body, hostname) {
     return new Promise(function (resolve, reject) {
@@ -67,18 +67,14 @@ exports.waitMongo = async function (mongo) {
 };
 
 exports.compose = function (from, to) {
-    return new MailComposer({
+    return compose({
         from, to, subject: 'subject', html: '<p>Hello</p>',
         attachments: [{filename: 'text1.txt', content: 'hello world!'}]
     });
 };
 
 exports.build = function (mail) {
-    return new Promise(resolve => {
-        mail['compile']()['build'](async (err, message) => {
-            resolve(message);
-        })
-    })
+    return build(mail);
 };
 
 exports.checkMails = async function (path, length, session) {

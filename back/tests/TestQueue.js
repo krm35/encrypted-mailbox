@@ -15,6 +15,12 @@ const {waitMongo, httpGet, build, compose, wait} = require("./utilities");
     await redis.lpush("queue", JSON.stringify({id: email, message}));
     await wait(1000);
     ({data} = await httpGet('/sent', email));
-    strictEqual(data.count - 1, count);
+    strictEqual(count + 1, data.count);
+    await redis.lpush("queue", JSON.stringify({
+        id: email, message: {from: email, to: "friend@friend.com"}
+    }));
+    await wait(1000);
+    ({data} = await httpGet('/sent', email));
+    strictEqual(count + 2, data.count);
     process.exit(0);
 })();

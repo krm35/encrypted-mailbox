@@ -3,6 +3,7 @@ const fs = require('fs'),
     {simpleParser} = require('mailparser'),
     {ObjectId} = require('mongodb'),
     {Encrypter} = require("nodemailer-openpgp"),
+    MailComposer = require("nodemailer/lib/mail-composer"),
     co = require('../constants'),
     sendmail = require('sendmail')(co.sendmailConf),
     mongo = require('../mongo'),
@@ -141,6 +142,18 @@ const event = (address, type, parsed) => {
 };
 
 module.exports.event = event;
+
+module.exports.compose = function (mail) {
+    return new MailComposer(mail);
+};
+
+module.exports.build = function (mail) {
+    return new Promise(resolve => {
+        mail['compile']()['build'](async (err, message) => {
+            resolve(message);
+        })
+    })
+};
 
 function iterate(cursor, documents, page, items) {
     return new Promise((resolve, reject) => {
