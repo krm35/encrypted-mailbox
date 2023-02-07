@@ -1,4 +1,10 @@
-const fs = require('fs');
+const fs = require('fs'),
+    {Readable} = require('stream');
+
+module.exports.sendBuffer = (res, buffer) => {
+    res.id = 1;
+    pipeStreamOverResponse(res, Readable.from(buffer), buffer.length);
+};
 
 module.exports.sendAttachment = (res, fileName) => {
     res.id = 1;

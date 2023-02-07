@@ -6,6 +6,7 @@ const path = require('path'),
     w = require("../words"),
     cors = require('../utilities/cors'),
     router = require('../router'),
+    {sendBuffer} = require('../utilities/download'),
     {isConnectedAsync} = require('../utilities/checkClient'),
     WebSocketServer = require('./ws-server');
 
@@ -14,9 +15,9 @@ process.on('uncaughtException', function (err) {
 });
 
 function sendFile(res, fileName) {
-    res.writeStatus('200 OK')
-        .writeHeader("Content-Type", extensions[path.extname(fileName)])
-        .end(router['files'][fileName]);
+    res.writeStatus('200 OK').writeHeader("Content-Type", extensions[path.extname(fileName)]);
+    if (!router['files'][fileName]) res.end();
+    else sendBuffer(res, router['files'][fileName]);
 }
 
 let sslConfig = {};
