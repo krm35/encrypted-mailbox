@@ -45,10 +45,10 @@ uws['App'](sslConfig).ws('/*', {
         const extensions = req.getHeader('sec-websocket-extensions');
         req.cookie = req.getHeader('cookie');
         req.query = req.getQuery();
-        const session = await getUser(req);
-        if (!session || !session['id']) return res.close();
+        const user = await getUser(req);
+        if (!user || !user['email']) return res.close();
         res.upgrade(
-            {session, key},
+            {user, key},
             key,
             protocol,
             extensions,

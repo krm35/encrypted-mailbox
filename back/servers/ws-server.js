@@ -1,49 +1,19 @@
-const w = require('../words'),
-    router = require('../router'),
-    userEvents = {};
-
+const userEvents = {};
 let id = 0;
 
 module.exports.open = async function (ws) {
-    if (!userEvents[ws.session.id]) userEvents[ws.session.id] = {};
+    const {email} = ws.user;
+    if (!userEvents[email]) userEvents[email] = {};
     ws.id = ++id;
-    userEvents[ws.session.id][ws.id] = ws;
-};
-
-module.exports.message = async function (ws, json) {
-    try {
-        const message = JSON.parse(json);
-        if (!router[message['message']]) return;
-        userEvent({...ws.session, message}, (result) => {
-            try {
-                ws.send(result);
-            } catch (e) {
-
-            }
-        });
-    } catch (e) {
-    }
+    userEvents[email][ws.id] = ws;
 };
 
 module.exports.close = function (ws) {
     try {
-        delete userEvents[ws.session.id][ws.id];
-        if (ws.queue) ws.queue.kill();
+        delete userEvents[ws.session.email][ws.id];
     } catch (e) {
     }
 };
-
-function userEvent(params, callback) {
-    const {id, message, ip} = params;
-    router[message['message']](
-        id, message, (error, data) => {
-            callback(JSON.stringify({error, data, id: message.id}));
-        }, {ip})
-        .catch((e) => {
-            if (!w[e]) console.log(e);
-            callback(JSON.stringify({error: true, data: w[e] || w.UNKNOWN_ERROR, id: message.id}));
-        });
-}
 
 const heartbeat = JSON.stringify({hb: 1});
 
