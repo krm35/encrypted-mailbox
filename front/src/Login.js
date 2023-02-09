@@ -36,7 +36,7 @@ export default function Login(props) {
     }, []);
 
     async function signUp() {
-        setLoader(true);
+        setLoader("signup");
         const passphrase = randomBytes(64).toString('hex');
         const {privateKey, publicKey} = await generateKey({
             type: 'rsa',
@@ -52,14 +52,14 @@ export default function Login(props) {
             .then(async (result) => {
                 const {error, data} = result.data;
                 if (error) {
-                    setLoader(false);
+                    setLoader(null);
                     return toast(data);
                 }
                 await setKeys(email, passphrase, publicKey, privateKey);
                 props.setConnected(true);
             }).catch(() => {
             toast("Something went wrong :(");
-            setLoader(false);
+            setLoader(null);
         });
     }
 
@@ -84,17 +84,17 @@ export default function Login(props) {
                 props.setConnected(true);
             }).catch(() => {
             toast("Something went wrong :(");
-            setLoader(false);
+            setLoader(null);
         });
     }
 
     function signIn() {
-        setLoader(true);
+        setLoader("signin");
         HTTPClient.post('/signin', {email})
             .then(async (result) => {
                 const {error, data} = result.data;
                 if (error) {
-                    setLoader(false);
+                    setLoader(null);
                     return toast(data);
                 }
                 try {
@@ -113,12 +113,12 @@ export default function Login(props) {
                     await setKeys(email, passphrase, data['publicKey'], data['privateKey'], data['encryptedPassphrase']);
                     signMessage(data['token'], cleartextMessage);
                 } catch (e) {
-                    setLoader(false);
+                    setLoader(null);
                     toast("INVALID PASSWORD");
                 }
             })
             .catch(() => {
-                setLoader(false);
+                setLoader(null);
                 toast("Something went wrong :(");
             })
     }
@@ -152,7 +152,8 @@ export default function Login(props) {
                 </form>
                 <div style={{width: "80%", display: "flex", margin: "0 auto"}}>
                     <Button
-                        loading={loader}
+                        loading={loader === 'signin'}
+                        disabled={loader !== null}
                         id={"sign-in"}
                         outlined={true}
                         fill={true}
@@ -162,7 +163,8 @@ export default function Login(props) {
                     </Button>
                     &nbsp;&nbsp;
                     <Button
-                        loading={loader}
+                        loading={loader === 'signup'}
+                        disabled={loader !== null}
                         outlined={true}
                         fill={true}
                         onClick={() => signUp().catch(() => {
