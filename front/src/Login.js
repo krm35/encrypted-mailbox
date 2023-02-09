@@ -23,7 +23,7 @@ export default function Login(props) {
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [loader, setLoader] = useState(null);
-    
+
     useEffect(() => {
         setTimeout(function () {
             try {
@@ -51,7 +51,10 @@ export default function Login(props) {
         HTTPClient.post('/signup', {email, publicKey, privateKey, encryptedPassphrase})
             .then(async (result) => {
                 const {error, data} = result.data;
-                if (error) return toast(data);
+                if (error) {
+                    setLoader(false);
+                    return toast(data);
+                }
                 await setKeys(email, passphrase, publicKey, privateKey);
                 props.setConnected(true);
             }).catch(() => {
@@ -110,12 +113,14 @@ export default function Login(props) {
                     await setKeys(email, passphrase, data['publicKey'], data['privateKey'], data['encryptedPassphrase']);
                     signMessage(data['token'], cleartextMessage);
                 } catch (e) {
+                    setLoader(false);
                     toast("INVALID PASSWORD");
                 }
-            }).catch(() => {
-            setLoader(false);
-            toast("Something went wrong :(");
-        });
+            })
+            .catch(() => {
+                setLoader(false);
+                toast("Something went wrong :(");
+            })
     }
 
     return <div>
