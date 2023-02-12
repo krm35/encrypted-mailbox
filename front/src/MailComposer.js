@@ -95,7 +95,8 @@ export default function MailViewer(props) {
             }
             try {
                 const signingKey = draft ? getKey("armoredPublicKey") : publicKey;
-                const action = draft ? "draft" : ("send" + (props.mail ? "&id=" + props.mail._id : ""));
+                const action = draft ? "draft" :
+                    ("send" + (props.mail && !props.mail.composeType ? "&id=" + props.mail._id : ""));
                 await sendMail(!signingKey ? message : await encrypt(message, [signingKey]), action);
                 if (publicKey && !draft) {
                     await sendMail(await encrypt(message, [getKey("armoredPublicKey")]), "copy");
