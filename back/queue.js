@@ -1,6 +1,7 @@
 const redis = require('./redis'),
     router = require('./router'),
-    {build, compose} = require("./utilities/commons");
+    c = require('./constants'),
+    {build, compose, encryptMail} = require("./utilities/commons");
 
 const client = redis.duplicate();
 
@@ -11,10 +12,19 @@ client.on('error', function (err) {
     // noinspection InfiniteLoopJS
     while (true) {
         try {
-            const [, mail] = await client.brpop("queue", 0);
-            const {id, message} = JSON.parse(mail);
+            const [, mail] = await client.brpop("email", 0);
+            let {id, message} = JSON.parse(mail);
+            if (typeof message === "object") {
+                if (!id) {
+                    id = "no-reply" + c.domain;
+                    message.from = id;
+                }
+                const {pgp} = message;
+                message = (await build(compose(message))).toString();
+                if (pgp) message = await encryptMail(message, [pgp]);
+            }
             await router['send'](id, {}, () => {
-            }, {message: typeof message === "object" ? (await build(compose(message))).toString() : message});
+            }, {message});
         } catch (e) {
             console.log(e);
         }
