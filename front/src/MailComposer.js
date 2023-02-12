@@ -10,8 +10,9 @@ import {detectMimeType} from "./mime-types";
 
 function getSubject(mail) {
     if (!mail) return "";
-    if (mail.composeType === "reply") return "RE: " + mail.subject;
-    if (mail.composeType === "forward") return "FWD: " + mail.subject;
+    const subject = mail.subject || "";
+    if (mail.composeType === "reply") return "RE: " + subject;
+    if (mail.composeType === "forward") return "FWD: " + subject;
 }
 
 function getTo(mail) {
