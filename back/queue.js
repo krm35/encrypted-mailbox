@@ -1,7 +1,7 @@
 const redis = require('./redis'),
-    router = require('./router'),
     c = require('./constants'),
-    {build, compose, encryptMail} = require("./utilities/commons");
+    {build, compose, parseMail, sendMail, encryptMail} = require("./utilities/commons"),
+    from = "noreply" + c.domain;
 
 const client = redis.duplicate();
 
@@ -13,18 +13,10 @@ client.on('error', function (err) {
     while (true) {
         try {
             const [, mail] = await client.brpop("email", 0);
-            let {id, message} = JSON.parse(mail);
-            if (typeof message === "object") {
-                if (!id) {
-                    id = "no-reply" + c.domain;
-                    message.from = id;
-                }
-                const {pgp} = message;
-                message = (await build(compose(message))).toString();
-                if (pgp) message = await encryptMail(message, [pgp]);
-            }
-            await router['send'](id, {}, () => {
-            }, {message});
+            const {to, subject, html, pgp} = JSON.parse(mail);
+            const builtMessage = await build(await compose({from, to, subject, html}));
+            const message = pgp ? await encryptMail(builtMessage, [pgp]) : builtMessage;
+            await sendMail({from, to, subject, html, message});
         } catch (e) {
             console.log(e);
         }
