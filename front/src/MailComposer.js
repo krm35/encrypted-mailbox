@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from "react";
-import {Button, Dialog, EditableText, FileInput, MenuDivider, Tag} from "@blueprintjs/core";
+import {Button, Dialog, EditableText, FileInput, Icon, MenuDivider, Tag} from "@blueprintjs/core";
 import * as Classes from "@blueprintjs/core/lib/cjs/common/classes";
 import MailComposer from "nodemailer/lib/mail-composer";
 import {Encrypter} from "nodemailer-openpgp";
@@ -7,6 +7,8 @@ import {HTTPClient} from "./HTTPClient";
 import {arrayBufferToBuffer, decryptMail, getKey, replaceAll, toast} from "./utilities";
 import KeyViewer from "./KeyViewer";
 import {detectMimeType} from "./mime-types";
+import FileSaver from 'file-saver';
+
 
 function getSubject(mail) {
     if (!mail) return "";
@@ -166,6 +168,10 @@ export default function MailViewer(props) {
                             style={{margin: "3px"}}
                             key={i}
                             round={true}
+                            icon={<Icon
+                                icon={"floppy-disk"}
+                                onClick={() => FileSaver['saveAs'](new Blob([a.content], {type: detectMimeType(a.filename)}), a.filename)}
+                            />}
                             onRemove={() => {
                                 attachments[i].valid = null;
                                 setAttachments([...attachments]);
