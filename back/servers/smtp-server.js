@@ -70,8 +70,9 @@ server.listen(c.smtpPort, c.host);
 function getPublicKeys(parsed) {
     return new Promise(async resolve => {
         const publicKeys = [];
-        for (const {address} of parsed.to.value) {
+        for (let {address} of parsed.to.value) {
             if (address.endsWith(c.domain)) {
+                if (address.includes("+")) address = address.split('+')[0] + c.domain;
                 const publicKey = users[address] ||
                     await redis.get(address + "publicKey") ||
                     (await mongo[0].collection('users').findOne({email: address})).publicKey;

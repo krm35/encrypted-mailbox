@@ -19,7 +19,7 @@ router['sent'] = async (id, json, callback) => {
 router['send'] = async (id, json, callback, args) => {
     const message = args.message || buildMessageFromBuffer(json);
     const parsed = await parseMail(message);
-    if (!parsed || parsed.from.value.length > 1 || parsed.from.value[0].address !== id) throw w.UNAUTHORIZED_OPERATION;
+    if (!parsed || !parsed.from || parsed.from.value.length > 1 || parsed.from.value[0].address !== id) throw w.UNAUTHORIZED_OPERATION;
     const encrypted = isEncrypted(parsed);
     const encryptedMessage = encrypted ? parsed : await parseMail(await encryptMail(message, [await redis.get(id + "publicKey")]));
     const {to, subject, html, attachments} = parsed;

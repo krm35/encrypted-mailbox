@@ -112,20 +112,24 @@ let error, data;
     /*******send to a friend encrypted******/
 
 
-    /*******send to friends same domain******/
+    /*******send to friends same domain and alias******/
     const friends = ["friend1" + Date.now() + c.domain, "friend2" + Date.now() + c.domain];
     for (const f of friends) {
         await redis.set(f + "publicKey", publicKey);
         await redis.set("session" + f, JSON.stringify({email: f}));
     }
+    friends.push(friends[0].split('@')[0] + "+alias" + c.domain);
+    friends.push(friends[1].split('@')[0] + "+aaaaa" + c.domain);
+
     data = compose(email, friends);
     await httpPost('/upload?action=send', session, false, null, await build(data));
     await wait(260);
     for (const f of friends) {
+        if (f.includes("+")) continue;
         data = await mongo[0].collection('mailbox').find({'headers.to.value.address': f}).toArray();
-        strictEqual(data.length, 1);
+        strictEqual(data.length, 2);
         strictEqual(data[0].headers.to.value.length, 1);
-        strictEqual(data[0].headers.to.text, friends[0] + ", " + friends[1]);
+        strictEqual(data[0].headers.to.text, friends[0] + ", " + friends[1] + ", " + friends[2] + ", " + friends[3]);
     }
     data = await mongo[0].collection('sent').find({'headers.from.value.address': email}).toArray();
     strictEqual(data.length, 5);
@@ -138,10 +142,11 @@ let error, data;
     await checkMails('/mailbox', 2, session);
     await checkMails('/sent', 5, session);
     for (const f of friends) {
-        await checkMails('/mailbox', 1, f);
+        if (f.includes("+")) continue;
+        await checkMails('/mailbox', 2, f);
         await checkMails('/sent', 0, f);
     }
-    /*******send to friends same domain******/
+    /*******send to friends same domain and alias******/
 
 
     process.exit(0);
