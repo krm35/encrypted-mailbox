@@ -85,7 +85,7 @@ function forwardHeader(mail) {
     return "------- Forwarded Message -------\n" +
         "From: <" + mail.from.text + ">\n" +
         "Date: " + new Date(mail.date).toLocaleString() + "\n" +
-        "Subject: " + mail.subject + "\n" +
+        "Subject: " + (mail.subject || "") + "\n" +
         "To: " + mail.to.text + "\n";
 }
 
