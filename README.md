@@ -44,7 +44,8 @@ _Create a secrets.json file in the back directory_
   "sslKeySmtp": "path to key if ssl for smtp",
   "sslCertSmtp": "path to cert if ssl for smtp",
   "attachments": "optional - path to the attachments directory",
-  "allowNonAdminSignUp": "boolean true by default -> anyone can sign up"
+  "allowNonAdminSignUp": "boolean true by default -> anyone can sign up",
+  "enableQueue": "boolean true by default -> enable the queue to send email from no-reply@yourdomain"
 }
 ```
 

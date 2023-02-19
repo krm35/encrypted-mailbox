@@ -1,7 +1,9 @@
 const redis = require('./redis'),
     c = require('./constants'),
-    {build, compose, parseMail, sendMail, encryptMail} = require("./utilities/commons"),
+    {build, compose, sendMail, encryptMail} = require("./utilities/commons"),
     from = "noreply" + c.domain;
+
+if (!c.enableQueue) return;
 
 const client = redis.duplicate();
 

@@ -26,6 +26,7 @@ map.redisConf = {
     port: 6379
 };
 map.allowNonAdminSignUp = true;
+map.enableQueue = true;
 map.isDev = !fs.existsSync(secret);
 
 if (!map.isDev) {
