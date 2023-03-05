@@ -44,7 +44,7 @@ const server = new SMTPServer({
                         const parsed = isEncrypted(email) ? await parseMail(message) :
                             await parseMail(await encryptMail(message, [publicKey]));
                         parsed.dkim = result;
-                        const to = parsed.headers.get("to").value.filter(({address}) => !address.endsWith(c.domain));
+                        const to = parsed.headers.get("to").value.filter(({address}) => !c.domains.includes('@' + address.split('@')[1]));
                         to.push({address, name: ''});
                         parsed.headers.get("to").value = to;
                         saveAttachments(parsed);
@@ -71,8 +71,9 @@ function getPublicKeys(parsed) {
     return new Promise(async resolve => {
         const publicKeys = [];
         for (let {address} of parsed.to.value) {
-            if (address.endsWith(c.domain)) {
-                if (address.includes("+")) address = address.split('+')[0] + c.domain;
+            const domain = '@' + address.split('@')[1];
+            if (c.domains.includes(domain)) {
+                if (address.includes("+")) address = address.split('+')[0] + domain;
                 const publicKey = users[address] ||
                     await redis.get(address + "publicKey") ||
                     (await mongo[0].collection('users').findOne({email: address})).publicKey;

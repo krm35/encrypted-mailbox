@@ -24,6 +24,7 @@ _Create a secrets.json file in the back directory_
 ```
 {
   "domain": "@yourdomain.yourextension",
+  "domains": ["@yourdomain2.yourextension"],
   "sendmailConf": {
     "silent": true,
     "dkim": {

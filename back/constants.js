@@ -4,6 +4,7 @@ const fs = require('fs'),
 
 map.attachments = __dirname + "/attachments/";
 map.domain = "@localhost.com";
+map.domains = ["@localhost1.com"];
 map.host = "127.0.0.1";
 map.ssl = false;
 map.sslKey = "";
@@ -45,5 +46,7 @@ if (map.sendmailConf.dkim) {
 map.__dirname = map.attachments;
 
 if (!fs.existsSync(map.__dirname)) fs.mkdirSync(map.__dirname);
+
+map.domains.push(map.domain);
 
 module.exports = map;
