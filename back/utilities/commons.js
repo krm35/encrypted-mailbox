@@ -119,11 +119,16 @@ const Utf8ArrayToStr = (array) => {
 };
 
 module.exports.getDocuments = async (id, json, collection, callback, filter) => {
-    let {page, items} = json;
+    let {page, items, start, end} = json;
     if (!page || isNaN(page)) page = 1;
     if (!items || isNaN(items) || items > 100) items = 25;
     let count = 0;
     const documents = [];
+    if (start || end) {
+        filter._id = {};
+        if (start) filter._id.$gte = ObjectId(Math.floor(new Date(start.split('T')[0]) / 1000).toString(16) + "0000000000000000");
+        if (end && start !== end) filter._id.$lte = ObjectId(Math.floor(new Date(end) / 1000).toString(16) + "0000000000000000");
+    }
     const cursor = await mongo[0].collection(collection).find(filter);
     count += await cursor.count();
     await iterate(cursor, documents, page, items);

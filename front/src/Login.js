@@ -28,8 +28,7 @@ export default function Login(props) {
         setTimeout(function () {
             try {
                 if (!document.getElementById("password").value.length) return;
-                const signInButton = document.getElementById("sign-in");
-                if (signInButton) signInButton.click();
+                document.getElementById("sign-in")?.click();
             } catch (e) {
             }
         }, 1000);

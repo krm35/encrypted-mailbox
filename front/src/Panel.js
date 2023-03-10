@@ -7,6 +7,7 @@ import Loader from "./Loader";
 import MailComposer from "./MailComposer";
 import Credentials from "./Credentials";
 import {initWS, updateTheme} from "./utilities";
+import {DateRangeInput} from "@blueprintjs/datetime";
 
 export default function Panel() {
 
@@ -17,6 +18,8 @@ export default function Panel() {
     const [tabId, setTabId] = useState("Mailbox");
     const [filter/*, setFilter*/] = useState({});
     const [documents, setDocuments] = useState(null);
+    const [start, setStart] = useState(null);
+    const [end, setEnd] = useState(null);
     const [compose, setCompose] = useState(null);
     const [credentials, setCredentials] = useState(null);
     const [theme, setTheme] = useState(localStorage['smtp-theme']);
@@ -36,7 +39,7 @@ export default function Panel() {
 
     useEffect(() => {
         setDocuments(null);
-        HTTPClient.post("/" + tabId.toLowerCase(), {page, items: itemsPerPage, filter})
+        HTTPClient.post("/" + tabId.toLowerCase(), {page, items: itemsPerPage, filter, start, end})
             .then(res => {
                 const {error, data} = res.data;
                 if (error) {
@@ -47,7 +50,7 @@ export default function Panel() {
                 setLastPage(Math.ceil(data['count'] / itemsPerPage));
             })
             .catch(() => console.log("error"))
-    }, [tabId, page, itemsPerPage, filter]);
+    }, [tabId, page, itemsPerPage, filter, start, end]);
 
     return (
         <div>
@@ -107,6 +110,20 @@ export default function Panel() {
             <br/>
 
             <H3>&nbsp;{tabId}</H3>
+
+            <div style={{margin: "5px"}}>
+                <DateRangeInput
+                    allowSingleDayRange={true}
+                    formatDate={date => date.toLocaleDateString()}
+                    onChange={(range) => {
+                        console.log(range);
+                        setStart(range[0]);
+                        setEnd(range[1]);
+                    }}
+                    parseDate={str => new Date(str)}
+                    value={[start, end]}
+                />
+            </div>
 
             {documents === null ? <Loader/> :
                 <HTMLTable bordered interactive style={{marginTop: "5px", marginBottom: "5px", width: '100%'}}>
