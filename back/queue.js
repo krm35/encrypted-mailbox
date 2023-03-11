@@ -3,8 +3,6 @@ const redis = require('./redis'),
     {build, compose, sendMail, encryptMail} = require("./utilities/commons"),
     from = "noreply" + c.domain;
 
-if (!c.enableQueue) return;
-
 const client = redis.duplicate();
 
 client.on('error', function (err) {
@@ -15,6 +13,7 @@ client.on('error', function (err) {
     while (true) {
         try {
             const [, mail] = await client.brpop("email", 0);
+            if (!c.enableQueue) continue;
             const {to, subject, html, pgp} = JSON.parse(mail);
             const builtMessage = await build(await compose({from, to, subject, html}));
             const message = pgp ? await encryptMail(builtMessage, [pgp]) : builtMessage;
