@@ -129,6 +129,8 @@ module.exports.getDocuments = async (id, json, collection, callback, filter) => 
         if (start) filter._id.$gte = ObjectId(Math.floor(new Date(start.split('T')[0]) / 1000).toString(16) + "0000000000000000");
         if (end && start !== end) filter._id.$lte = ObjectId(Math.floor(new Date(end) / 1000).toString(16) + "0000000000000000");
     }
+    const {open} = json?.filter;
+    if (open !== undefined && collection === "mailbox") filter.open = open;
     const cursor = await mongo[0].collection(collection).find(filter);
     count += await cursor.count();
     await iterate(cursor, documents, page, items);

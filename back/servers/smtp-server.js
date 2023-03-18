@@ -48,6 +48,7 @@ const server = new SMTPServer({
                         to.push({address, name: ''});
                         parsed.headers.get("to").value = to;
                         saveAttachments(parsed);
+                        parsed.open = false;
                         await mongo[0].collection("mailbox").insertOne(parsed);
                         event(address, 'Mailbox', parsed);
                     }

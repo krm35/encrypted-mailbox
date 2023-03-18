@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from "react";
-import {Button, H3, HTMLTable, Navbar} from "@blueprintjs/core";
+import {Button, Checkbox, H3, HTMLTable, Icon, Navbar} from "@blueprintjs/core";
 import Pagination from "./Pagination";
 import MailViewer from "./MailViewer";
 import {HTTPClient} from "./HTTPClient";
@@ -16,7 +16,7 @@ export default function Panel() {
     const [itemsPerPage] = useState(10);
     const [lastPage, setLastPage] = useState(1);
     const [tabId, setTabId] = useState("Mailbox");
-    const [filter/*, setFilter*/] = useState({});
+    const [filter, setFilter] = useState({});
     const [documents, setDocuments] = useState(null);
     const [start, setStart] = useState(null);
     const [end, setEnd] = useState(null);
@@ -123,8 +123,15 @@ export default function Panel() {
                     parseDate={str => new Date(str)}
                     value={[start, end]}
                 />
-            </div>
 
+            </div>
+            {tabId === "Mailbox" &&
+            <Checkbox
+                style={{marginLeft: "10px"}}
+                checked={filter.open !== undefined}
+                label="Only unread"
+                onChange={() => setFilter({...filter, open: filter.open !== undefined ? undefined : false})}
+            />}
             {documents === null ? <Loader/> :
                 <HTMLTable bordered interactive style={{marginTop: "5px", marginBottom: "5px", width: '100%'}}>
                     <thead>
@@ -142,9 +149,10 @@ export default function Panel() {
                                 <tr key={doc._id}
                                     onClick={() => {
                                         if (tabId === "Drafts") setCompose(true);
+                                        doc.open = true;
                                         setMail(doc);
                                     }}>
-                                    <td>{text}</td>
+                                    <td>{doc.open === false ? <Icon icon={"envelope"}/> : null}&nbsp;{text}</td>
                                     <td>{doc.subject}</td>
                                     <td>{new Date(doc.t).toLocaleString('fr')}</td>
                                 </tr>)

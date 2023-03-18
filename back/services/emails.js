@@ -38,6 +38,7 @@ router['attachment'] = async (id, json, callback, args) => {
     const {_id, type, index} = json;
     const email = await mongo[0].collection(type || "mailbox").findOne({_id: ObjectId(_id)});
     if (!email || !email.attachments[index]) throw w.INVALID_EMAIL;
+    if (email.open === false) await mongo[0].collection(type || "mailbox").updateOne({_id: ObjectId(_id)}, {$set: {open: true}});
     const attachment = email.attachments[index];
     const {res, origin} = args;
     const headers = {
