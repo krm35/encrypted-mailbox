@@ -1,7 +1,7 @@
 const redis = require('./redis'),
     c = require('./constants'),
     {build, compose, sendMail, encryptMail} = require("./utilities/commons"),
-    from = "noreply" + c.domain;
+    noreply = "noreply" + c.domain;
 
 const client = redis.duplicate();
 
@@ -14,10 +14,10 @@ client.on('error', function (err) {
         try {
             const [, mail] = await client.brpop("email", 0);
             if (!c.enableQueue) continue;
-            const {to, subject, html, pgp} = JSON.parse(mail);
-            const builtMessage = await build(await compose({from, to, subject, html}));
+            const {from, to, subject, html, pgp} = JSON.parse(mail);
+            const builtMessage = await build(await compose({from: from || noreply, to, subject, html}));
             const message = pgp ? await encryptMail(builtMessage, [pgp]) : builtMessage;
-            await sendMail({from, to, subject, html, message});
+            await sendMail({from: from || noreply, to, subject, html, message});
         } catch (e) {
             console.log(e);
         }
