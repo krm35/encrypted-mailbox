@@ -122,59 +122,62 @@ export default function Login(props) {
             })
     }
 
-    return <div>
-        <Dialog isOpen={true}>
-            <div className={Classes.DIALOG_BODY}>
-                <form>
-                    <FormGroup
-                        label="Email address"
-                        labelFor="email"
-                    >
-                        <InputGroup
-                            id="email"
-                            type={"email"}
-                            onChange={(e) => setEmail(e.target.value)}
-                            value={email}
-                        />
-                    </FormGroup>
-                    <FormGroup
-                        label="Password"
-                        labelFor="password"
-                    >
-                        <InputGroup
-                            id="password"
-                            type={"password"}
-                            onChange={(e) => setPassword(e.target.value)}
-                            value={password}
-                        />
-                    </FormGroup>
-                </form>
-                <div style={{width: "80%", display: "flex", margin: "0 auto"}}>
-                    <Button
-                        loading={loader === 'signin'}
-                        disabled={loader !== null}
-                        id={"sign-in"}
-                        outlined={true}
-                        fill={true}
-                        onClick={() => signIn()}
-                    >
-                        Sign in
-                    </Button>
-                    &nbsp;&nbsp;
-                    <Button
-                        loading={loader === 'signup'}
-                        disabled={loader !== null}
-                        outlined={true}
-                        fill={true}
-                        onClick={() => signUp().catch(() => {
-                            toast("INVALID EMAIL");
-                        })}
-                    >
-                        Sign up
-                    </Button>
-                </div>
-            </div>
-        </Dialog>
-    </div>
+    function onKeyDown({key}) {
+        if (key === 'Enter') signIn();
+    }
 
+    return <Dialog isOpen={true}>
+        <div className={Classes.DIALOG_BODY}>
+            <form>
+                <FormGroup
+                    label="Email address"
+                    labelFor="email"
+                >
+                    <InputGroup
+                        id="email"
+                        type={"email"}
+                        onChange={(e) => setEmail(e.target.value)}
+                        value={email}
+                        onKeyDown={onKeyDown}
+                    />
+                </FormGroup>
+                <FormGroup
+                    label="Password"
+                    labelFor="password"
+                >
+                    <InputGroup
+                        id="password"
+                        type={"password"}
+                        onChange={(e) => setPassword(e.target.value)}
+                        value={password}
+                        onKeyDown={onKeyDown}
+                    />
+                </FormGroup>
+            </form>
+            <div style={{width: "80%", display: "flex", margin: "0 auto"}}>
+                <Button
+                    loading={loader === 'signin'}
+                    disabled={loader !== null}
+                    id={"sign-in"}
+                    outlined={true}
+                    fill={true}
+                    onClick={() => signIn()}
+                >
+                    Sign in
+                </Button>
+                &nbsp;&nbsp;
+                <Button
+                    loading={loader === 'signup'}
+                    disabled={loader !== null}
+                    outlined={true}
+                    fill={true}
+                    onClick={() => signUp().catch(() => {
+                        toast("INVALID EMAIL");
+                    })}
+                >
+                    Sign up
+                </Button>
+            </div>
+        </div>
+    </Dialog>
 }

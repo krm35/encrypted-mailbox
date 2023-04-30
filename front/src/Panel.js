@@ -148,7 +148,10 @@ export default function Panel() {
                             return (
                                 <tr key={doc._id}
                                     onClick={() => {
-                                        if (tabId === "Drafts") setCompose(true);
+                                        if (tabId === "Drafts") {
+                                            doc.draft = true;
+                                            setCompose(true);
+                                        }
                                         doc.open = true;
                                         setMail(doc);
                                     }}>

@@ -8,13 +8,15 @@ import {arrayBufferToBuffer, decryptMail, getKey, replaceAll, toast} from "./uti
 import KeyViewer from "./KeyViewer";
 import {detectMimeType} from "./mime-types";
 import FileSaver from 'file-saver';
+import DraftAlert from "./DraftAlert";
 
 
 function getSubject(mail) {
     if (!mail) return "";
     const subject = mail.subject || "";
-    if (mail.composeType === "reply") return "RE: " + subject;
-    if (mail.composeType === "forward") return "FWD: " + subject;
+    if (mail.composeType === "reply" && !subject.startsWith("RE:")) return "RE: " + subject;
+    if (mail.composeType === "forward" && !subject.startsWith("FWD:")) return "FWD: " + subject;
+    return subject;
 }
 
 function getTo(mail) {
@@ -34,13 +36,14 @@ export default function MailViewer(props) {
     const [publicKey, setPublicKey] = useState(null);
     const [keyViewerOpen, setKeyViewerOpen] = useState(null);
     const [focus, setFocus] = useState(null);
+    const [alert, setAlert] = useState(null);
 
     if (props.mail) decryptMail(props.mail, props.setMail, "drafts", setText, setAttachments);
 
     useEffect(() => {
         setTimeout(() => {
             const mailContentDiv = document.getElementById("mail-content");
-            if (focus || !props.mail || !mailContentDiv) return;
+            if (focus || !props.mail || props.mail.draft || !mailContentDiv) return;
             if (mailContentDiv.parentElement.childNodes[0].tagName === "TEXTAREA") {
                 mailContentDiv.parentElement.childNodes[0].setSelectionRange(0, 0);
                 setFocus(true);
@@ -98,7 +101,7 @@ export default function MailViewer(props) {
             }
             try {
                 const signingKey = draft ? getKey("armoredPublicKey") : publicKey;
-                const action = draft ? "draft" :
+                const action = draft ? ("draft" + (props?.mail?.draft ? "&id=" + props.mail._id : "")) :
                     ("send" + (props.mail && !props.mail.composeType ? "&id=" + props.mail._id : ""));
                 await sendMail(!signingKey ? message : await encrypt(message, [signingKey]), action);
                 if (publicKey && !draft) {
@@ -119,7 +122,7 @@ export default function MailViewer(props) {
                 if (props.setMail) props.setMail(null);
                 props.setCompose(null);
                 if (error) return toast(data);
-                toast(action === "draft" ? "Draft saved" : "Email sent", "success");
+                toast(action.startsWith("draft") ? "Draft saved" : "Email sent", "success");
             })
             .catch((e) => {
                 console.log("error", e);
@@ -133,6 +136,7 @@ export default function MailViewer(props) {
             title={"Compose an email"}
             isOpen={true}
             onClose={() => {
+                if (subject?.length || text?.length) return setAlert(true);
                 if (props.setMail) props.setMail(null);
                 props.setCompose(null)
             }}
@@ -181,7 +185,6 @@ export default function MailViewer(props) {
                 </div>
                 <div style={{display: "none"}}>
                     <FileInput
-                        multiple={true}
                         inputProps={{id: "attachments", multiple: true}}
                         onInputChange={(e) => {
                             const {files} = e.target;
@@ -255,5 +258,14 @@ export default function MailViewer(props) {
         </Dialog>
         <KeyViewer _key={publicKey} setKey={setPublicKey} keyViewerOpen={keyViewerOpen}
                    setKeyViewerOpen={setKeyViewerOpen}/>
+        <DraftAlert
+            onConfirm={saveDraft}
+            alert={alert}
+            setAlert={setAlert}
+            onCancel={() => {
+                if (props.setMail) props.setMail(null);
+                props.setCompose(null)
+            }}
+        />
     </div>
 }
