@@ -91,7 +91,13 @@ export default function MailViewer(props) {
             bcc,
             subject,
             html: draft ? text : replaceAll(text, "\n", "<br/>"),
-            attachments: Array.from(attachments).filter(a => a.valid !== null)
+            attachments: Array.from(attachments).filter(a => {
+                if (!a.contentType) {
+                    a.content = arrayBufferToBuffer(a.content);
+                    a.contentType = detectMimeType(a.filename);
+                }
+                return a.valid !== null
+            })
         });
         mail['compile']()['build'](async (err, message) => {
             if (err) {
