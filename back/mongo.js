@@ -1,5 +1,5 @@
-const {MongoClient} = require('mongodb'),
-    cluster = require('cluster'),
+const cluster = require('cluster'),
+    {MongoClient, GridFSBucket} = require('mongodb'),
     replicaSet = false,
     machines = ["127.0.0.1:27017", "127.0.0.1:27018", "127.0.0.1:27019"],
     db = {};
@@ -15,6 +15,8 @@ const {MongoClient} = require('mongodb'),
             serverSelectionTimeoutMS: 5000
         }).catch(() => process.exit(0));
     db[0] = await client.db("pgp-smtp");
+    db[0 + "bucket"] = new GridFSBucket(db[0]);
+
     if (cluster.isMaster) {
         await checkIndex(db[0], 'users', 'email');
     }

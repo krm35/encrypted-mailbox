@@ -2,6 +2,9 @@ const http = require('http'),
     crypto = require("crypto"),
     {strictEqual} = require('assert'),
     querystring = require('querystring'),
+    {ObjectId} = require('mongodb'),
+    c = require('../constants'),
+    mongo = require('../mongo'),
     {compose, build} = require("../utilities/commons");
 
 const httpRequest = function (path, session, dontParse, headers, body, hostname) {
@@ -81,4 +84,9 @@ exports.checkMails = async function (path, length, session) {
     const {data} = await httpRequest(path, session);
     strictEqual(data.documents.length, length);
     strictEqual(data.count, length);
+};
+
+exports.fileExists = async function (fileId, value) {
+    if (!c.gridfs) strictEqual(fs.existsSync(c.__dirname + fileId), value || true);
+    else strictEqual((await mongo[0 + "bucket"].find({_id: ObjectId(fileId)}).toArray()).length, value === undefined ? 1 : 0);
 };

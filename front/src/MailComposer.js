@@ -126,8 +126,9 @@ export default function MailViewer(props) {
             .then(res => {
                 const {error, data} = res.data;
                 if (props.setMail) props.setMail(null);
-                props.setCompose(null);
+                setLoader(null);
                 if (error) return toast(data);
+                props.setCompose(null);
                 toast(action.startsWith("draft") ? "Draft saved" : "Email sent", "success");
             })
             .catch((e) => {

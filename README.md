@@ -46,7 +46,8 @@ _Create a secrets.json file in the back directory_
   "sslCertSmtp": "path to cert if ssl for smtp",
   "attachments": "optional - path to the attachments directory",
   "allowNonAdminSignUp": "boolean true by default -> anyone can sign up",
-  "enableQueue": "boolean true by default -> enable the queue to send email from no-reply@yourdomain"
+  "enableQueue": "boolean true by default -> enable the queue to send email from no-reply@yourdomain",
+  "gridfs": "boolean true by default -> Save attachments in mongodb"
 }
 ```
 

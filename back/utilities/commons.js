@@ -1,5 +1,6 @@
 const fs = require('fs'),
     crypto = require('crypto'),
+    {Readable} = require('stream'),
     {simpleParser} = require('mailparser'),
     {ObjectId} = require('mongodb'),
     {Encrypter} = require("nodemailer-openpgp"),
@@ -64,9 +65,15 @@ module.exports.saveAttachments = (parsed) => {
     if (attachments && Array.isArray(attachments) && attachments.length) {
         parsed.attachments = attachments.filter(f => f.filename);
         parsed.attachments.forEach(f => {
-            const id = crypto.randomBytes(14).toString('hex');
-            fs.writeFileSync(co.__dirname + id, f.content);
-            f.content = id;
+            let id;
+            if (co.gridfs) {
+                id = ObjectId();
+                Readable.from(f.content).pipe(mongo[0 + "bucket"].openUploadStreamWithId(id))
+            } else {
+                id = crypto.randomBytes(14).toString('hex');
+                fs.writeFileSync(co.__dirname + id, f.content);
+            }
+            f.content = id.toString();
         });
     }
 };
@@ -74,7 +81,11 @@ module.exports.saveAttachments = (parsed) => {
 module.exports.deleteMail = async (id, json, callback, collection, type, eventType) => {
     const _id = ObjectId(json.id);
     const draft = await mongo[0].collection(collection).findOne({_id, ['headers.' + type + '.value.address']: id});
-    draft.attachments.forEach(a => fs.unlinkSync(co.__dirname + a.content));
+    if (!draft) return callback(true, w.UNKNOWN_ERROR);
+    for (const {content} of draft.attachments) {
+        if (content.length === 24) await mongo[0 + "bucket"].delete(ObjectId(content));
+        else fs.unlinkSync(co.__dirname + content)
+    }
     await mongo[0].collection(collection).deleteOne({_id});
     callback(false);
     draft.deleted = true;
@@ -129,7 +140,7 @@ module.exports.getDocuments = async (id, json, collection, callback, filter) => 
         if (start) filter._id.$gte = ObjectId(Math.floor(new Date(start.split('T')[0]) / 1000).toString(16) + "0000000000000000");
         if (end && start !== end) filter._id.$lte = ObjectId(Math.floor(new Date(end) / 1000).toString(16) + "0000000000000000");
     }
-    const {open} = json?.filter;
+    const {open} = json?.filter ?? {};
     if (open !== undefined && collection === "mailbox") filter.open = open;
     const cursor = await mongo[0].collection(collection).find(filter);
     count += await cursor.count();

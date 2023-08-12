@@ -1,14 +1,27 @@
 const fs = require('fs'),
-    {Readable} = require('stream');
+    {Readable} = require('stream'),
+    {ObjectId} = require('mongodb'),
+    co = require('../constants'),
+    mongo = require('../mongo');
 
-module.exports.sendBuffer = (res, buffer) => {
+const sendBuffer = (res, buffer) => {
     res.id = 1;
     pipeStreamOverResponse(res, Readable.from(buffer), buffer.length);
 };
 
+module.exports.sendBuffer = sendBuffer;
+
 module.exports.sendAttachment = (res, fileName) => {
     res.id = 1;
-    pipeStreamOverResponse(res, fs.createReadStream(fileName), fs.statSync(fileName).size);
+    if (fileName.length === 24) {
+        const stream = mongo[0 + "bucket"].openDownloadStream(ObjectId(fileName));
+        const chunks = [];
+        stream.on('data', chunk => chunks.push(chunk));
+        stream.on('error', () => res.end());
+        stream.on('end', () => sendBuffer(res, Buffer.concat(chunks)))
+    } else {
+        pipeStreamOverResponse(res, fs.createReadStream(co.__dirname + fileName), fs.statSync(co.__dirname + fileName).size);
+    }
 };
 
 function toArrayBuffer(buffer) {
@@ -21,7 +34,7 @@ function onAbortedOrFinishedResponse(res, readStream) {
 }
 
 function pipeStreamOverResponse(res, readStream, totalSize) {
-    readStream.on('data', (chunk) => {
+    readStream.on('data', chunk => {
         const ab = toArrayBuffer(chunk);
         let lastOffset = res.getWriteOffset();
         let [ok, done] = res.tryEnd(ab, totalSize);
@@ -41,10 +54,6 @@ function pipeStreamOverResponse(res, readStream, totalSize) {
                 return ok;
             });
         }
-    }).on('error', () => {
-        res.end();
-    });
-    res.onAborted(() => {
-        onAbortedOrFinishedResponse(res, readStream);
-    });
+    }).on('error', () => res.end());
+    res.onAborted(() => onAbortedOrFinishedResponse(res, readStream));
 }

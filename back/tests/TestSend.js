@@ -9,6 +9,7 @@ const {checkMails} = require("./utilities");
 const {httpPost, wait, waitMongo} = require("./utilities");
 const {build} = require("./utilities");
 const {compose} = require("./utilities");
+const {fileExists} = require("./utilities");
 const {encryptMail} = require("../utilities/commons");
 
 let error, data;
@@ -39,7 +40,7 @@ let error, data;
         }
     }
     let {content, contentType, filename} = data[0].attachments[0];
-    strictEqual(fs.existsSync(c.__dirname + content), true);
+    await fileExists(content);
     strictEqual(typeof content, "string");
     strictEqual(contentType, "application/octet-stream");
     strictEqual(filename, "encrypted.asc");
@@ -86,7 +87,7 @@ let error, data;
     strictEqual(typeof content, "string");
     strictEqual(contentType, "application/octet-stream");
     strictEqual(filename, "encrypted.asc");
-    strictEqual(fs.existsSync(c.__dirname + content), true);
+    await fileExists(content);
     await checkMails('/mailbox', 2, session);
     await checkMails('/sent', 3, session);
     /*******send to a friend******/
@@ -103,7 +104,7 @@ let error, data;
     strictEqual(data.length, 4);
     strictEqual(data[3].attachments.length, 1);
     ({content, contentType, filename} = data[3].attachments[0]);
-    strictEqual(fs.existsSync(c.__dirname + content), true);
+    await fileExists(content);
     strictEqual(typeof content, "string");
     strictEqual(contentType, "application/octet-stream");
     strictEqual(filename, "encrypted.asc");
@@ -135,7 +136,7 @@ let error, data;
     strictEqual(data.length, 5);
     strictEqual(data[4].attachments.length, 1);
     ({content, contentType, filename} = data[4].attachments[0]);
-    strictEqual(fs.existsSync(c.__dirname + content), true);
+    await fileExists(content);
     strictEqual(typeof content, "string");
     strictEqual(contentType, "application/octet-stream");
     strictEqual(filename, "encrypted.asc");

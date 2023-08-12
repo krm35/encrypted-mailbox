@@ -7,7 +7,7 @@ const w = require("../words");
 const mongo = require("../mongo");
 const redis = require("../redis");
 const {checkMails} = require("./utilities");
-const {build, compose, httpPost, httpGet, wait, query, waitMongo} = require("./utilities");
+const {build, compose, httpPost, httpGet, wait, query, waitMongo, fileExists} = require("./utilities");
 const {encryptMail} = require("../utilities/commons");
 
 let error, data;
@@ -39,7 +39,7 @@ let error, data;
     strictEqual(attachments.length, 1);
     strictEqual(typeof attachments[0].content, "string");
     strictEqual(attachments[0].contentType, "application/octet-stream");
-    strictEqual(fs.existsSync(c.__dirname + attachments[0].content), true);
+    await fileExists(attachments[0].content);
 
     const id = "" + data._id;
 
@@ -53,7 +53,7 @@ let error, data;
 
     ({error} = await httpGet('/delete-draft' + query({id}), session));
     strictEqual(error, false);
-    strictEqual(fs.existsSync(c.__dirname + attachments[0].content), false);
+    await fileExists(attachments[0].content, false);
 
     await checkMails('/drafts', 0, session);
 

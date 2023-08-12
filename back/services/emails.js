@@ -23,7 +23,7 @@ router['send'] = async (id, json, callback, args) => {
     const encrypted = isEncrypted(parsed);
     const encryptedMessage = encrypted ? parsed : await parseMail(await encryptMail(message, [await redis.get(id + "publicKey")]));
     const {to, subject, html, attachments} = parsed;
-    // don't save encrypted email because we make a readable copy
+    // don't save encrypted email because the front makes a encrypted copy at first
     if (!encrypted) saveAttachments(encryptedMessage);
     await sendMail({from: id, to: to.text, subject, html, attachments});
     if (!encrypted) {
@@ -49,6 +49,6 @@ router['attachment'] = async (id, json, callback, args) => {
     res.writeStatus('200 OK');
     for (let i in headers) res.writeHeader(i, "" + headers[i]);
     res["headerWritten"] = true;
-    sendAttachment(res, co.__dirname + attachment.content);
+    sendAttachment(res, attachment.content);
     callback();
 };

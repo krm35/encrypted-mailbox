@@ -6,6 +6,7 @@
   "scripts": {
     "dev back": "node hot-reload.js",
     "start": "node index.js",
+    "test": "cd tests && node test.js",
     "audit": "npm audit"
   },
   "dependencies": {
