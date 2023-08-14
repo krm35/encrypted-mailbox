@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from "react";
-import {Button, Checkbox, H3, HTMLTable, Icon, Navbar} from "@blueprintjs/core";
+import {Button, Checkbox, H3, HTMLSelect, HTMLTable, Icon, Navbar} from "@blueprintjs/core";
 import Pagination from "./Pagination";
 import MailViewer from "./MailViewer";
 import {HTTPClient} from "./HTTPClient";
@@ -9,11 +9,18 @@ import Credentials from "./Credentials";
 import {initWS, toast, updateTheme} from "./utilities";
 import {DateRangeInput} from "@blueprintjs/datetime";
 
+const options = [
+    {label: "10 mails", value: 10},
+    {label: "25 mails", value: 25},
+    {label: "50 mails", value: 50},
+    {label: "100 mails", value: 100}
+];
+
 export default function Panel() {
 
     const [mail, setMail] = useState(null);
     const [page, setPage] = useState(1);
-    const [itemsPerPage] = useState(10);
+    const [itemsPerPage, setItemsPerPage] = useState(localStorage['itemsPerPage'] || 25);
     const [lastPage, setLastPage] = useState(1);
     const [tabId, setTabId] = useState("Mailbox");
     const [filter, setFilter] = useState({});
@@ -118,7 +125,7 @@ export default function Panel() {
 
             <H3>&nbsp;{tabId}</H3>
 
-            <div style={{margin: "5px"}}>
+            <div style={{margin: "5px", display: "flex"}}>
                 <DateRangeInput
                     allowSingleDayRange={true}
                     formatDate={date => date.toLocaleDateString()}
@@ -130,7 +137,18 @@ export default function Panel() {
                     parseDate={str => new Date(str)}
                     value={[start, end]}
                 />
-
+                <div>
+                    <HTMLSelect
+                        options={options}
+                        fill={true}
+                        onChange={(event) => {
+                            const {value} = event.currentTarget;
+                            setItemsPerPage(value);
+                            localStorage['itemsPerPage'] = value;
+                        }}
+                        value={itemsPerPage}
+                    />
+                </div>
             </div>
             {tabId === "Mailbox" &&
             <Checkbox
