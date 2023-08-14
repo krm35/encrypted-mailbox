@@ -6,7 +6,7 @@ import {HTTPClient} from "./HTTPClient";
 import Loader from "./Loader";
 import MailComposer from "./MailComposer";
 import Credentials from "./Credentials";
-import {initWS, updateTheme} from "./utilities";
+import {initWS, toast, updateTheme} from "./utilities";
 import {DateRangeInput} from "@blueprintjs/datetime";
 
 export default function Panel() {
@@ -82,6 +82,12 @@ export default function Panel() {
                         text="Drafts"
                         onClick={() => setTabId("Drafts")}
                     />
+                    <Button
+                        minimal={tabId === "Trash"}
+                        icon="trash"
+                        text="Trash"
+                        onClick={() => setTabId("Trash")}
+                    />
                     {/*<Button*/}
                     {/*    minimal={tabId === "Archive"}*/}
                     {/*    icon="projects"*/}
@@ -139,25 +145,31 @@ export default function Panel() {
                         <th>{tabId === "Mailbox" ? "From" : "To"}</th>
                         <th>Subject</th>
                         <th>@</th>
+                        {tabId !== "Trash" && <th/>}
                     </tr>
                     </thead>
                     <tbody>
                     {documents.map(doc => {
                             const type = tabId === "Mailbox" ? "from" : "to";
                             const text = !doc[type] ? "" : doc[type].text;
+                            const onClick = () => {
+                                if (tabId === "Drafts") {
+                                    doc.draft = true;
+                                    setCompose(true);
+                                }
+                                doc.open = true;
+                                setMail(doc);
+                            };
                             return (
-                                <tr key={doc._id}
-                                    onClick={() => {
-                                        if (tabId === "Drafts") {
-                                            doc.draft = true;
-                                            setCompose(true);
-                                        }
-                                        doc.open = true;
-                                        setMail(doc);
-                                    }}>
-                                    <td>{doc.open === false ? <Icon icon={"envelope"}/> : null}&nbsp;{text}</td>
-                                    <td>{doc.subject}</td>
-                                    <td>{new Date(doc.t).toLocaleString('fr')}</td>
+                                <tr key={doc._id}>
+                                    <td onClick={onClick}>{doc.open === false ?
+                                        <Icon icon={"envelope"}/> : null}&nbsp;{text}</td>
+                                    <td onClick={onClick}>{doc.subject}</td>
+                                    <td onClick={onClick}>{new Date(doc.t).toLocaleString('fr')}</td>
+                                    {tabId !== "Trash" && <td><Button onClick={() =>
+                                        HTTPClient.post("/" + tabId.toLowerCase() + "-trash", {id: doc._id})
+                                            .catch(() => toast("Something went wrong :("))
+                                    } outlined={true} icon={"trash"}/></td>}
                                 </tr>)
                         }
                     )}

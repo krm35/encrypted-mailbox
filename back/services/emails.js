@@ -16,6 +16,22 @@ router['sent'] = async (id, json, callback) => {
     await getDocuments(id, json, "sent", callback, {'headers.from.value.address': id});
 };
 
+router['trash'] = async (id, json, callback) => {
+    await getDocuments(id, json, "trash", callback, {'headers.from.value.address': id});
+};
+
+router['drafts-trash'] = async (id, json, callback) => {
+    await deleteMail(id, json, callback, 'drafts', 'from', 'Drafts', 'trash');
+};
+
+router['sent-trash'] = async (id, json, callback) => {
+    await deleteMail(id, json, callback, 'sent', 'from', 'Sent', 'trash');
+};
+
+router['mailbox-trash'] = async (id, json, callback) => {
+    await deleteMail(id, json, callback, 'mailbox', 'to', 'Mailbox', 'trash');
+};
+
 router['send'] = async (id, json, callback, args) => {
     const message = args.message || buildMessageFromBuffer(json);
     const parsed = await parseMail(message);

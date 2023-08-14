@@ -78,18 +78,22 @@ module.exports.saveAttachments = (parsed) => {
     }
 };
 
-module.exports.deleteMail = async (id, json, callback, collection, type, eventType) => {
+module.exports.deleteMail = async (id, json, callback, collection, type, eventType, move) => {
     const _id = ObjectId(json.id);
-    const draft = await mongo[0].collection(collection).findOne({_id, ['headers.' + type + '.value.address']: id});
-    if (!draft) return callback(true, w.UNKNOWN_ERROR);
-    for (const {content} of draft.attachments) {
-        if (content.length === 24) await mongo[0 + "bucket"].delete(ObjectId(content));
-        else fs.unlinkSync(co.__dirname + content)
+    const mail = await mongo[0].collection(collection).findOne({_id, ['headers.' + type + '.value.address']: id});
+    if (!mail) return callback(true, w.UNKNOWN_ERROR);
+    if (move) {
+        await mongo[0].collection(move).insertOne(mail);
+    } else {
+        for (const {content} of mail.attachments) {
+            if (content.length === 24) await mongo[0 + "bucket"].delete(ObjectId(content));
+            else fs.unlinkSync(co.__dirname + content)
+        }
     }
     await mongo[0].collection(collection).deleteOne({_id});
     callback(false);
-    draft.deleted = true;
-    event(id, eventType, draft);
+    mail.deleted = true;
+    event(id, eventType, mail);
 };
 
 const Utf8ArrayToStr = (array) => {
