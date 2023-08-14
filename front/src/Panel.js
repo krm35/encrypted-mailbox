@@ -23,6 +23,7 @@ export default function Panel() {
     const [compose, setCompose] = useState(null);
     const [credentials, setCredentials] = useState(null);
     const [theme, setTheme] = useState(localStorage['smtp-theme']);
+    filter.open = localStorage['filter.open'] ? false : undefined;
 
     window.newDoc = (json) => {
         if (json[1].deleted) {
@@ -136,7 +137,13 @@ export default function Panel() {
                 style={{marginLeft: "10px"}}
                 checked={filter.open !== undefined}
                 label="Only unread"
-                onChange={() => setFilter({...filter, open: filter.open !== undefined ? undefined : false})}
+                onChange={() => {
+                    const open = filter.open !== undefined ? undefined : false;
+                    if (open !== undefined) localStorage['filter.open'] = open;
+                    else delete localStorage['filter.open'];
+                    setFilter({...filter, open: open})
+                }
+                }
             />}
             {documents === null ? <Loader/> :
                 <HTMLTable bordered interactive style={{marginTop: "5px", marginBottom: "5px", width: '100%'}}>
