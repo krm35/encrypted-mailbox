@@ -14,7 +14,7 @@ import DraftAlert from "./DraftAlert";
 function getSubject(mail) {
     if (!mail) return "";
     const subject = mail.subject || "";
-    if (mail.composeType === "reply" && !subject.startsWith("RE:")) return "RE: " + subject;
+    if (mail.composeType === "reply" && !subject.toUpperCase().startsWith("RE:")) return "RE: " + subject;
     if (mail.composeType === "forward" && !subject.startsWith("FWD:")) return "FWD: " + subject;
     return subject;
 }

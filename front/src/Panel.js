@@ -167,7 +167,7 @@ export default function Panel() {
                 <HTMLTable bordered interactive style={{marginTop: "5px", marginBottom: "5px", width: '100%'}}>
                     <thead>
                     <tr>
-                        <th>{tabId === "Mailbox" ? "From" : "To"}</th>
+                        <th width="25%">{tabId === "Mailbox" ? "From" : "To"}</th>
                         <th>Subject</th>
                         <th>@</th>
                         {tabId !== "Trash" && <th/>}
