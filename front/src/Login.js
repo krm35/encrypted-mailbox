@@ -80,6 +80,7 @@ export default function Login(props) {
             .then(async (result) => {
                 const {error, data} = result.data;
                 if (error) return toast(data);
+                if (window.location.protocol === "http:") document.cookie = "session=" + data;
                 props.setConnected(true);
             }).catch(() => {
             toast("Something went wrong :(");
