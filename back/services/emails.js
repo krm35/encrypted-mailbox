@@ -1,5 +1,4 @@
 const {ObjectId} = require('mongodb'),
-    co = require('../constants'),
     router = require('../router'),
     w = require('../words'),
     redis = require('../redis'),
@@ -8,28 +7,30 @@ const {ObjectId} = require('mongodb'),
     cors = require('../utilities/cors'),
     {sendAttachment} = require("../utilities/download");
 
-router['mailbox'] = async (id, json, callback) => {
-    await getDocuments(id, json, "mailbox", callback, {'headers.to.value.address': id});
+const from = 'from', to = 'to', mailbox = 'mailbox', sent = 'sent', trash = 'trash', drafts = 'drafts';
+
+router[mailbox] = async (id, json, callback) => {
+    await getDocuments(id, json, mailbox, callback, {'headers.to.value.address': id});
 };
 
-router['sent'] = async (id, json, callback) => {
-    await getDocuments(id, json, "sent", callback, {'headers.from.value.address': id});
+router[sent] = async (id, json, callback) => {
+    await getDocuments(id, json, sent, callback, {'headers.from.value.address': id});
 };
 
-router['trash'] = async (id, json, callback) => {
-    await getDocuments(id, json, "trash", callback, {'headers.from.value.address': id});
+router[trash] = async (id, json, callback) => {
+    await getDocuments(id, json, trash, callback, {'headers.from.value.address': id});
 };
 
 router['drafts-trash'] = async (id, json, callback) => {
-    await deleteMail(id, json, callback, 'drafts', 'from', 'Drafts', 'trash');
+    await deleteMail(id, json, callback, drafts, from, 'Drafts', trash);
 };
 
 router['sent-trash'] = async (id, json, callback) => {
-    await deleteMail(id, json, callback, 'sent', 'from', 'Sent', 'trash');
+    await deleteMail(id, json, callback, sent, from, 'Sent', trash);
 };
 
 router['mailbox-trash'] = async (id, json, callback) => {
-    await deleteMail(id, json, callback, 'mailbox', 'to', 'Mailbox', 'trash');
+    await deleteMail(id, json, callback, mailbox, to, 'Mailbox', trash);
 };
 
 router['send'] = async (id, json, callback, args) => {
@@ -43,18 +44,18 @@ router['send'] = async (id, json, callback, args) => {
     if (!encrypted) saveAttachments(encryptedMessage);
     await sendMail({from: id, to: to.text, subject, html, attachments});
     if (!encrypted) {
-        await mongo[0].collection('sent').insertOne(encryptedMessage);
+        await mongo[0].collection(sent).insertOne(encryptedMessage);
         event(id, 'Sent', encryptedMessage);
     }
-    if (json.id) await deleteMail(id, json, callback, 'drafts', 'from', 'Drafts');
+    if (json.id) await deleteMail(id, json, callback, drafts, from, 'Drafts');
     else callback(false);
 };
 
 router['attachment'] = async (id, json, callback, args) => {
     const {_id, type, index} = json;
-    const email = await mongo[0].collection(type || "mailbox").findOne({_id: ObjectId(_id)});
+    const email = await mongo[0].collection(type || mailbox).findOne({_id: ObjectId(_id)});
     if (!email || !email.attachments[index]) throw w.INVALID_EMAIL;
-    if (email.open === false) await mongo[0].collection(type || "mailbox").updateOne({_id: ObjectId(_id)}, {$set: {open: true}});
+    if (email.open === false) await mongo[0].collection(type || mailbox).updateOne({_id: ObjectId(_id)}, {$set: {open: true}});
     const attachment = email.attachments[index];
     const {res, origin} = args;
     const headers = {
