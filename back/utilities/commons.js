@@ -83,6 +83,7 @@ module.exports.deleteMail = async (id, json, callback, collection, type, eventTy
     const mail = await mongo[0].collection(collection).findOne({_id, ['headers.' + type + '.value.address']: id});
     if (!mail) return callback(true, w.UNKNOWN_ERROR);
     if (move) {
+        mail.id = id;
         await mongo[0].collection(move).insertOne(mail);
     } else {
         for (const {content} of mail.attachments) {

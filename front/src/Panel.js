@@ -152,7 +152,7 @@ export default function Panel() {
             </div>
             {tabId === "Mailbox" &&
             <Checkbox
-                style={{marginLeft: "10px"}}
+                style={{marginLeft: "10px", width: "150px"}}
                 checked={filter.open !== undefined}
                 label="Only unread"
                 onChange={() => {

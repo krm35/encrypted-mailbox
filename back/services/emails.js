@@ -18,7 +18,7 @@ router[sent] = async (id, json, callback) => {
 };
 
 router[trash] = async (id, json, callback) => {
-    await getDocuments(id, json, trash, callback, {'headers.from.value.address': id});
+    await getDocuments(id, json, trash, callback, {id});
 };
 
 router['drafts-trash'] = async (id, json, callback) => {
