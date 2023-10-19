@@ -17,7 +17,8 @@ process.on('uncaughtException', function (err) {
 function sendFile(res, fileName) {
     if (!router['files'][fileName]) return res.writeStatus('404 Not Found').end();
     res.writeStatus('200 OK').writeHeader("Content-Type", extensions[path.extname(fileName)]);
-    sendBuffer(res, router['files'][fileName]);
+    const file = router['files'][fileName];
+    sendBuffer(res, !c.cache ? file() : file);
 }
 
 let sslConfig = {};

@@ -1,4 +1,5 @@
 const fs = require('fs'),
+    c = require('./constants'),
     router = {};
 
 router['noUserCheck'] = {};
@@ -12,18 +13,11 @@ function loadFiles(path, module) {
             if (fs.lstatSync(path + files[f]).isDirectory()) {
                 loadFiles(path + files[f] + "/", module);
             } else {
-                fs.readFile(path + files[f], function (err, data) {
-                    if (module) {
-                        const code = data.toString().toLowerCase().replace(/\n/gi, '').replace(/ /gi, '');
-                        if (code.includes('router=require')) {
-                            require('./' + path + files[f]);
-                        }
-                    } else {
-                        if (files[f] === "index.html" && path.includes("unstable")) files[f] = "unstable.html";
-                        if (router['files'][files[f]]) return;
-                        router['files'][files[f]] = data;
-                    }
-                })
+                if (module) {
+                    if (files[f].endsWith('.js') || files[f].endsWith('.jsc')) require('./' + path + files[f]);
+                } else {
+                    router['files'][files[f]] = !c.cache ? () => fs.readFileSync(path + files[f]) : fs.readFileSync(path + files[f]);
+                }
             }
         }
     });
