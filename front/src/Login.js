@@ -27,7 +27,7 @@ export default function Login(props) {
     useEffect(() => {
         setTimeout(function () {
             try {
-                if (!document.getElementById("password").value.length) return;
+                if (!document.getElementById("password").value.length || !props.autologin) return;
                 document.getElementById("sign-in")?.click();
             } catch (e) {
             }

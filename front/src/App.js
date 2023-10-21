@@ -24,7 +24,7 @@ export default function App() {
     updateTheme();
 
     return <ErrorBoundary FallbackComponent={ErrorHandler}>
-        {!connected && <Login setConnected={setConnected}/>}
+        {!connected && <Login autologin={connected === false} setConnected={setConnected}/>}
         {connected && <Panel setConnected={setConnected}/>}
     </ErrorBoundary>;
 }

@@ -16,7 +16,7 @@ const options = [
     {label: "100 mails", value: 100}
 ];
 
-export default function Panel() {
+export default function Panel(props) {
 
     const [mail, setMail] = useState(null);
     const [page, setPage] = useState(1);
@@ -107,6 +107,12 @@ export default function Panel() {
                         icon="key"
                         text="Crendentials"
                         onClick={() => setCredentials(true)}
+                    />
+                    <Navbar.Divider/>
+                    <Button
+                        icon="log-out"
+                        text="Log out"
+                        onClick={() => props.setConnected(null)}
                     />
                     <Navbar.Divider/>
                     <Button
