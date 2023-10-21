@@ -1,4 +1,4 @@
-# **PGP-SMTP: an SMTP server with PGP**
+# **MAILBOX: Self-host a mailbox with your own domain name**
 
 **To start a dev server**
 
