@@ -22,7 +22,7 @@ router[trash] = async (id, json, callback) => {
 };
 
 router['drafts-trash'] = async (id, json, callback) => {
-    await deleteMail(id, json, callback, drafts, from, 'Drafts', trash);
+    await deleteMail(id, json, callback, drafts, from, 'Drafts');
 };
 
 router['sent-trash'] = async (id, json, callback) => {
