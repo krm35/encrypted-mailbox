@@ -21,3 +21,15 @@
 .fill {
     width: 100%;
 }
+
+.mail-content {
+    max-height: 300px !important;
+}
+
+.mail-content > textarea {
+    max-height: 300px !important;
+}
+
+.mail-content > span {
+    max-height: 300px !important;
+}

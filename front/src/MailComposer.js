@@ -164,6 +164,7 @@ export default function MailViewer(props) {
                 )}
                 <br/>
                 <EditableText
+                    className={"mail-content"}
                     contentId={"mail-content"}
                     placeholder="Write your email"
                     multiline={true}
