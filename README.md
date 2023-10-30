@@ -53,26 +53,26 @@ _Create a secrets.json file in the back directory_
 
 _Create a service_
 
-`nano pgp-smtp-daemon.service`
+`nano mailbox-daemon.service`
 
 ```
 [Unit]
-Description=Start pgp-smtp
+Description=Start mailbox
 
 [Service]
-WorkingDirectory=/home/YOURUSER/pgp-smtp/back
+WorkingDirectory=/home/YOURUSER/mailbox/back
 ExecStart=node index.js
 Restart=always
 RestartSec=5000ms
 
-SyslogIdentifier= pgp-smtp-daemon
+SyslogIdentifier= mailbox-daemon
 
 [Install]
 WantedBy=default.target
 
 ```
-`sudo cp pgp-smtp-daemon.service /etc/systemd/system/`
+`sudo cp mailbox-daemon.service /etc/systemd/system/`
 
-`sudo systemctl enable pgp-smtp-daemon `
+`sudo systemctl enable mailbox-daemon `
 
-`sudo systemctl start pgp-smtp-daemon`
+`sudo systemctl start mailbox-daemon`

@@ -64,8 +64,6 @@ export default function Panel(props) {
         <div>
             <Navbar>
                 <Navbar.Group>
-                    <Navbar.Heading><b>PGP-SMTP</b></Navbar.Heading>
-                    <Navbar.Divider/>
                     <Button
                         icon="send-message"
                         text="Compose"

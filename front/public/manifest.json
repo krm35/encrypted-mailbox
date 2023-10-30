@@ -1,6 +1,6 @@
 {
-  "short_name": "PGP-SMTP",
-  "name": "PGP-SMTP front-end",
+  "short_name": "Mailbox",
+  "name": "Mailbox front-end",
   "icons": [
     {
       "src": "favicon.ico",
