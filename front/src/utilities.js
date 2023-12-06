@@ -30,7 +30,7 @@ export function replaceAll(str, find, replace) {
 
 export function decryptMail(mail, setMail, type, setText, setAttachments) {
     if (!mail || mail.decrypted) return;
-    HTTPClient.get("/attachment?_id=" + mail._id + "&index=0&type=" + type)
+    HTTPClient.get("/attachment?_id=" + mail._id + "&type=" + type)
         .then(async ({data}) => {
             const message = await readMessage({armoredMessage: data});
             try {

@@ -54,9 +54,11 @@ router['send'] = async (id, json, callback, args) => {
 router['attachment'] = async (id, json, callback, args) => {
     const {_id, type, index} = json;
     const email = await mongo[0].collection(type || mailbox).findOne({_id: ObjectId(_id)});
-    if (!email || !email.attachments[index]) throw w.INVALID_EMAIL;
+    if (index !== undefined && (!email || !email.attachments[index])) throw w.INVALID_EMAIL;
     if (email.open === false) await mongo[0].collection(type || mailbox).updateOne({_id: ObjectId(_id)}, {$set: {open: true}});
-    const attachment = email.attachments[index];
+    let attachment;
+    if (index !== undefined) attachment = email.attachments[index];
+    else attachment = email.attachments.find(({filename}) => filename === 'encrypted.asc');
     const {res, origin} = args;
     const headers = {
         'Content-Type': attachment.contentType,
