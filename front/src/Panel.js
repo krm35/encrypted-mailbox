@@ -171,6 +171,7 @@ export default function Panel(props) {
                 <HTMLTable bordered interactive style={{marginTop: "5px", marginBottom: "5px", width: '100%'}}>
                     <thead>
                     <tr>
+                        {tabId === "Trash" && <th width="25%">From</th>}
                         <th width="25%">{tabId === "Mailbox" ? "From" : "To"}</th>
                         <th>Subject</th>
                         <th>@</th>
@@ -180,7 +181,7 @@ export default function Panel(props) {
                     <tbody>
                     {documents.map(doc => {
                             const type = tabId === "Mailbox" ? "from" : "to";
-                            const text = !doc[type] ? "" : doc[type].text;
+                            const text = doc[type]?.text ?? "";
                             const onClick = () => {
                                 if (tabId === "Drafts") {
                                     doc.draft = true;
@@ -191,6 +192,7 @@ export default function Panel(props) {
                             };
                             return (
                                 <tr key={doc._id}>
+                                    {tabId === "Trash" && <td>{doc["from"]?.text ?? ""}</td>}
                                     <td onClick={onClick}>{doc.open === false ?
                                         <Icon icon={"envelope"}/> : null}&nbsp;{text}</td>
                                     <td onClick={onClick}>{doc.subject}</td>
