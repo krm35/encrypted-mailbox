@@ -64,7 +64,7 @@ export function initWS() {
     const ws = new WebSocket(
         window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1" ?
             'ws://localhost:8080/' :
-            'wss://' + window.location.hostname
+            ((window.location.protocol === "https:" ? 'wss' : 'ws') + '://' + window.location.hostname)
     );
 
     ws.onopen = function () {
