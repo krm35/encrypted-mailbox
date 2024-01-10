@@ -129,21 +129,21 @@ async function handleRequest(req, res, method, url, origin, body) {
             }, {req, res, url, origin, admin: user['admin']}
         ).catch((e) => {
             if (!w[e] && c.isDev) console.log(e);
-            answer(req, res, origin, true, w[e] || w.UNKNOWN_ERROR);
+            answer(req, res, origin, true, w[e] || w.UNKNOWN_ERROR, e);
         });
     } catch (e) {
 
     }
 }
 
-const answer = function (req, res, origin, error, data) {
+const answer = function (req, res, origin, error, data, trigger) {
     if (res['headerWritten'] !== true) {
         res.writeStatus('200 OK');
         res.writeHeader("Content-Type", "application/json");
         const headers = {...(res['headerWritten'] || {}), ...cors(origin)};
         for (let i in headers) res.writeHeader(i, "" + headers[i]);
         if (!res.aborted) {
-            if (error !== undefined) res.end(JSON.stringify({error, data}));
+            if (error !== undefined) res.end(JSON.stringify({error, data, trigger}));
             else res.end();
         }
     }
