@@ -46,7 +46,7 @@ module.exports.sendMail = (message) => {
         sendmail(message, (err) => {
             if (first) return;
             first = true;
-            if (err) reject(w.UNKNOWN_ERROR);
+            if (err) reject(err);
             resolve();
         });
     });
