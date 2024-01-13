@@ -35,7 +35,7 @@ export default function MailViewer(props) {
                     id={"decrypted"}
                     dangerouslySetInnerHTML={{
                         __html: DOMPurify.sanitize(raw ? JSON.stringify(mail.decrypted) : mail.textAsHtml)
-                            .replace(/(\b(https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/ig, (url) => '<a href="' + url + '">' + url + '</a>')
+                            .replace(/(\b(https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/ig, (url) => '<a href="' + url + '" target="_blank">' + url + '</a>')
                     }}
                 />
             }
