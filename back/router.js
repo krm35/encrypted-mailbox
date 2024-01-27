@@ -14,7 +14,7 @@ function loadFiles(path, module) {
             loadFiles(path + files[f] + "/", module);
         } else {
             if (module) {
-                if (files[f].endsWith('.js') || files[f].endsWith('.jsc')) require('./' + path + files[f]);
+                if (files[f].endsWith('.js')) require('./' + path + files[f]);
             } else {
                 router['files'][files[f]] = !c.cache ? () => fs.readFileSync(path + files[f]) : fs.readFileSync(path + files[f]);
             }
@@ -24,3 +24,5 @@ function loadFiles(path, module) {
 
 loadFiles('services/', true);
 loadFiles('public/');
+
+fs.watchFile(c.__dirname + '/public/index.html', {interval: 1000}, () => loadFiles('public/'));
