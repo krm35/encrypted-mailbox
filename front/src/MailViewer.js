@@ -97,8 +97,9 @@ function forwardHeader(mail) {
 }
 
 function replyHeader(mail) {
+    const hasAngleBracket = mail.from.text.includes('<');
     return "------- Original Message -------\n" +
-        "On " + new Date(mail.date).toLocaleString() + ", <" + mail.from.text + "> wrote:";
+        "On " + new Date(mail.date).toLocaleString() + ", " + (hasAngleBracket ? "" : "<") + mail.from.text + (hasAngleBracket ? "" : ">") + " wrote:";
 }
 
 function header(mail) {
