@@ -42,7 +42,15 @@ router['send'] = async (id, json, callback, args) => {
     const {to, cc, bcc, subject, html, attachments} = parsed;
     // don't save encrypted email because the front makes a encrypted copy at first
     if (!encrypted) saveAttachments(encryptedMessage);
-    await sendMail({from: id, to: to.text, cc: cc.text, bcc: bcc.text, subject, html, attachments});
+    await sendMail({
+        from: id,
+        to: to.text,
+        cc: cc?.text ?? undefined,
+        bcc: bcc?.text ?? undefined,
+        subject,
+        html,
+        attachments
+    });
     if (!encrypted) {
         await mongo[0].collection(sent).insertOne(encryptedMessage);
         event(id, 'Sent', encryptedMessage);
