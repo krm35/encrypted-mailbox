@@ -39,10 +39,10 @@ router['send'] = async (id, json, callback, args) => {
     if (!parsed || !parsed.from || parsed.from.value.length > 1 || parsed.from.value[0].address !== id) throw w.UNAUTHORIZED_OPERATION;
     const encrypted = isEncrypted(parsed);
     const encryptedMessage = encrypted ? parsed : await parseMail(await encryptMail(message, [await redis.get(id + "publicKey")]));
-    const {to, subject, html, attachments} = parsed;
+    const {to, cc, bcc, subject, html, attachments} = parsed;
     // don't save encrypted email because the front makes a encrypted copy at first
     if (!encrypted) saveAttachments(encryptedMessage);
-    await sendMail({from: id, to: to.text, subject, html, attachments});
+    await sendMail({from: id, to: to.text, cc: cc.text, bcc: bcc.text, subject, html, attachments});
     if (!encrypted) {
         await mongo[0].collection(sent).insertOne(encryptedMessage);
         event(id, 'Sent', encryptedMessage);
