@@ -9,12 +9,22 @@ const {ObjectId} = require('mongodb'),
 
 const from = 'from', to = 'to', mailbox = 'mailbox', sent = 'sent', trash = 'trash', drafts = 'drafts';
 
+function buildFilter(id, json, type) {
+    const filter = {['headers.' + type + '.value.address']: id};
+    const {search} = json?.filter ?? {};
+    if (search?.length) {
+        filter['$or'] = [];
+        ['subject', 'headers.from.value.address'].forEach(p => filter['$or'].push({[p]: {$regex: search}}));
+    }
+    return filter;
+}
+
 router[mailbox] = async (id, json, callback) => {
-    await getDocuments(id, json, mailbox, callback, {'headers.to.value.address': id});
+    await getDocuments(id, json, mailbox, callback, buildFilter(id, json, 'to'));
 };
 
 router[sent] = async (id, json, callback) => {
-    await getDocuments(id, json, sent, callback, {'headers.from.value.address': id});
+    await getDocuments(id, json, sent, callback, buildFilter(id, json, 'from'));
 };
 
 router[trash] = async (id, json, callback) => {

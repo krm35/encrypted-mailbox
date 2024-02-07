@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from "react";
-import {Button, Checkbox, H3, HTMLSelect, HTMLTable, Icon, Navbar} from "@blueprintjs/core";
+import {Button, Checkbox, H3, HTMLSelect, HTMLTable, Icon, InputGroup, Navbar} from "@blueprintjs/core";
 import Pagination from "./Pagination";
 import MailViewer from "./MailViewer";
 import {HTTPClient} from "./HTTPClient";
@@ -130,6 +130,11 @@ export default function Panel(props) {
             <H3>&nbsp;{tabId}</H3>
 
             <div style={{margin: "5px", display: "flex"}}>
+                <InputGroup
+                    onChange={({target}) => setFilter({...filter, search: target.value})}
+                    placeholder={"Search"}
+                />
+                &nbsp;
                 <DateRangeInput
                     allowSingleDayRange={true}
                     formatDate={date => date.toLocaleDateString()}
@@ -141,6 +146,7 @@ export default function Panel(props) {
                     parseDate={str => new Date(str)}
                     value={[start, end]}
                 />
+                &nbsp;
                 <div>
                     <HTMLSelect
                         options={options}
