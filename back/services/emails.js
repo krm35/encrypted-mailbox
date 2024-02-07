@@ -14,7 +14,7 @@ function buildFilter(id, json, type) {
     const {search} = json?.filter ?? {};
     if (search?.length) {
         filter['$or'] = [];
-        ['subject', 'headers.from.value.address'].forEach(p => filter['$or'].push({[p]: {$regex: search}}));
+        ['subject', 'headers.' + (type === 'to' ? 'from' : 'to') + '.value.address'].forEach(p => filter['$or'].push({[p]: {$regex: search}}));
     }
     return filter;
 }
