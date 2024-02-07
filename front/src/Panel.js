@@ -132,6 +132,12 @@ export default function Panel(props) {
             <div style={{margin: "5px", display: "flex"}}>
                 <InputGroup
                     onChange={({target}) => setFilter({...filter, search: target.value})}
+                    rightElement={<Button
+                        icon={"cross"}
+                        minimal={true}
+                        onClick={() => setFilter({...filter, search: null})}
+                    />}
+                    value={filter?.search ?? ""}
                     placeholder={"Search"}
                 />
                 &nbsp;
