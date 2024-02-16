@@ -47,6 +47,7 @@ _Create a secrets.json file in the back directory_
   "attachments": "optional - path to the attachments directory",
   "allowNonAdminSignUp": "boolean true by default -> anyone can sign up",
   "enableQueue": "boolean true by default -> enable the queue to send email from no-reply@yourdomain",
+  "enableQueueLogs": "boolean true by default -> enable the queue logs and save them into mongo,
   "gridfs": "boolean true by default -> Save attachments in mongodb"
 }
 ```

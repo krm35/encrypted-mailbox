@@ -20,5 +20,6 @@ const {waitMongo, httpGet, wait} = require("./utilities");
     await wait(1000);
     ({data} = await httpGet('/mailbox', email));
     strictEqual(count + 2, data.count);
+    strictEqual((await mongo[0].collection("queue").find({}).toArray()).length > 0, true);
     process.exit(0);
 })();

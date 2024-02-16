@@ -23,9 +23,10 @@ map.sendmailConf = {
     devPort: 2525,
     rejectUnauthorized: false,
 };
-map.redisConf = {};
+map.redisConf = {port: 6380};
 map.allowNonAdminSignUp = true;
 map.enableQueue = true;
+map.enableQueueLogs = true;
 map.gridfs = true;
 map.cache = true;
 map.isDev = !fs.existsSync(secret);

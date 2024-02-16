@@ -1,4 +1,5 @@
 const redis = require('./redis'),
+    mongo = require('./mongo'),
     c = require('./constants'),
     {build, compose, sendMail, encryptMail} = require("./utilities/commons"),
     noreply = "noreply" + c.domain;
@@ -18,6 +19,7 @@ client.on('error', function (err) {
             const builtMessage = await build(await compose({from: from || noreply, to, subject, html}));
             const message = pgp ? await encryptMail(builtMessage, [pgp]) : builtMessage;
             await sendMail({from: from || noreply, to, subject, html, message});
+            if(c.enableQueueLogs) await mongo[0].collection("queue").insertOne({from, to, subject, html, pgp});
         } catch (e) {
             console.log(e);
         }
