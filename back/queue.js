@@ -23,8 +23,7 @@ client.on('error', function (err) {
                 from,
                 to,
                 subject,
-                html: pgp ? null : html,
-                pgp
+                html: pgp ? null : html
             });
         } catch (e) {
             console.log(e);
