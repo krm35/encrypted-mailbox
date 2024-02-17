@@ -20,7 +20,7 @@ client.on('error', function (err) {
             const message = pgp ? await encryptMail(builtMessage, [pgp]) : builtMessage;
             await sendMail({from: from || noreply, to, subject, html, message});
             if (c.enableQueueLogs) await mongo[0].collection("queue").insertOne({
-                from,
+                from: from || noreply,
                 to,
                 subject,
                 html: pgp ? null : html
