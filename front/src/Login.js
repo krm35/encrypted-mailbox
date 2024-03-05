@@ -78,6 +78,7 @@ export default function Login(props) {
     function signMessage(token, text) {
         HTTPClient.post('/sign', {token, text})
             .then(async (result) => {
+                setLoader(null);
                 const {error, data} = result.data;
                 if (error) return toast(data);
                 if (window.location.protocol === "http:") document.cookie = "session=" + data;
