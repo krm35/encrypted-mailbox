@@ -56,10 +56,11 @@ export default function Login(props) {
                 }
                 await setKeys(email, passphrase, publicKey, privateKey);
                 props.setConnected(true);
-            }).catch(() => {
-            toast("Something went wrong :(");
-            setLoader(null);
-        });
+            })
+            .catch(() => {
+                toast("Something went wrong :(");
+                setLoader(null);
+            });
     }
 
     async function setKeys(email, passphrase, publicKey, privateKey, encryptedPassphrase) {
@@ -77,16 +78,17 @@ export default function Login(props) {
 
     function signMessage(token, text) {
         HTTPClient.post('/sign', {token, text})
-            .then(async (result) => {
+            .then(result => {
                 setLoader(null);
                 const {error, data} = result.data;
                 if (error) return toast(data);
                 if (window.location.protocol === "http:") document.cookie = "session=" + data;
                 props.setConnected(true);
-            }).catch(() => {
-            toast("Something went wrong :(");
-            setLoader(null);
-        });
+            })
+            .catch(() => {
+                toast("Something went wrong :(");
+                setLoader(null);
+            });
     }
 
     function signIn() {
@@ -114,6 +116,7 @@ export default function Login(props) {
                     await setKeys(email, passphrase, data['publicKey'], data['privateKey'], data['encryptedPassphrase']);
                     signMessage(data['token'], cleartextMessage);
                 } catch (e) {
+                    console.log(e);
                     setLoader(null);
                     toast("INVALID PASSWORD");
                 }
