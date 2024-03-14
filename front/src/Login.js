@@ -116,7 +116,6 @@ export default function Login(props) {
                     await setKeys(email, passphrase, data['publicKey'], data['privateKey'], data['encryptedPassphrase']);
                     signMessage(data['token'], cleartextMessage);
                 } catch (e) {
-                    console.log(e);
                     setLoader(null);
                     toast("INVALID PASSWORD");
                 }
