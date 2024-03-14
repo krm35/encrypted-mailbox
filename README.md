@@ -1,4 +1,4 @@
-# **MAILBOX: Self-host a mailbox with your own domain name**
+# **MAILBOX: Self-host an encrypted mailbox with your own domain name**
 
 **To start a dev server**
 
