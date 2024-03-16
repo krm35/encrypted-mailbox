@@ -66,6 +66,7 @@ router['password'] = async (id, json, callback) => {
 
 async function checkSignature(text, publicKey) {
     const verificationResult = await openpgp.verify({
+        date: new Date(Date.now() + 5000),
         message: await openpgp.readCleartextMessage({cleartextMessage: text}),
         verificationKeys: await openpgp.readKey({armoredKey: publicKey})
     });

@@ -112,7 +112,11 @@ export default function Login(props) {
                     });
                     const message = await createCleartextMessage({text: data['token']});
                     // noinspection JSCheckFunctionSignatures
-                    const cleartextMessage = await sign({message, signingKeys: privateKey});
+                    const cleartextMessage = await sign({
+                        date: new Date(Date.now() - 5000),
+                        message,
+                        signingKeys: privateKey
+                    });
                     await setKeys(email, passphrase, data['publicKey'], data['privateKey'], data['encryptedPassphrase']);
                     signMessage(data['token'], cleartextMessage);
                 } catch (e) {
