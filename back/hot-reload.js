@@ -29,10 +29,7 @@ function recurse(path) {
 recurse('./');
 
 function reload() {
-    if (node) {
-        // noinspection JSCheckFunctionSignatures
-        node.kill('SIGKILL');
-    }
+    node?.kill('SIGKILL');
     node = null;
     setTimeout(function () {
         if (!node) node = start();
