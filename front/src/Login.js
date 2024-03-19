@@ -105,13 +105,11 @@ export default function Login(props) {
                         message: await readMessage({armoredMessage: data['encryptedPassphrase']}),
                         passwords: [password]
                     });
-                    // noinspection JSCheckFunctionSignatures
                     const privateKey = await decryptKey({
                         privateKey: await readPrivateKey({armoredKey: data['privateKey']}),
                         passphrase
                     });
                     const message = await createCleartextMessage({text: data['token']});
-                    // noinspection JSCheckFunctionSignatures
                     const cleartextMessage = await sign({
                         date: new Date(Date.now() - 5000),
                         message,
