@@ -55,11 +55,11 @@ export default function MailViewer(props) {
         if (!encryptionKeys) return message;
         return new Promise((resolve, reject) => {
             try {
+                const chunks = [];
                 const signer = new Encrypter({encryptionKeys});
                 signer.on('data', chunk => chunks.push(chunk));
                 signer.on('err', err => reject(err));
                 signer.on('end', () => resolve(Buffer.concat(chunks).toString('utf-8')));
-                const chunks = [];
                 signer.end(message);
             } catch (e) {
                 reject(e);
