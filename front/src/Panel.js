@@ -200,6 +200,7 @@ export default function Panel(props) {
                     {documents.map(doc => {
                             const type = tabId === "Mailbox" ? "from" : "to";
                             const text = doc[type]?.text ?? "";
+                            const id = doc._id;
                             const onClick = () => {
                                 if (tabId === "Drafts") {
                                     doc.draft = true;
@@ -209,16 +210,33 @@ export default function Panel(props) {
                                 setMail(doc);
                             };
                             return (
-                                <tr key={doc._id}>
+                                <tr key={id}>
                                     {tabId === "Trash" && <td>{doc["from"]?.text ?? ""}</td>}
-                                    <td onClick={onClick}>{doc.open === false ?
-                                        <Icon icon={"envelope"}/> : null}&nbsp;{text}</td>
+                                    <td onClick={onClick}>
+                                        <Icon
+                                            id={"unread" + id}
+                                            style={{display: doc.open === false ? "" : "none"}}
+                                            icon={"envelope"}/> &nbsp;{text}</td>
                                     <td onClick={onClick}>{doc.subject}</td>
                                     <td onClick={onClick}>{new Date(doc.t).toLocaleString('fr')}</td>
-                                    {tabId !== "Trash" && <td><Button onClick={() =>
-                                        HTTPClient.post("/" + tabId.toLowerCase() + "-trash", {id: doc._id})
-                                            .catch(() => toast("Something went wrong :("))
-                                    } outlined={true} icon={"trash"}/></td>}
+                                    {tabId !== "Trash" && <td>
+                                        <>
+                                            <Button onClick={() =>
+                                                HTTPClient.post("/" + tabId.toLowerCase() + "-trash", {id})
+                                                    .catch(() => toast("Something went wrong :("))
+                                            } outlined={true} icon={"trash"}/>
+                                            &nbsp;
+                                            {doc.open !== false && <Button id={"mark-unread" + id} onClick={() =>
+                                                HTTPClient.post("/mark-unread", {id})
+                                                    .then(() => {
+                                                        document.getElementById("unread" + id).style.display = "";
+                                                        document.getElementById("mark-unread" + id).style.display = "none";
+                                                    })
+                                                    .catch(() => toast("Something went wrong :("))
+                                            } outlined={true} icon={"envelope"}
+                                            />}
+                                        </>
+                                    </td>}
                                 </tr>)
                         }
                     )}

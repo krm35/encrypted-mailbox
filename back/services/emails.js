@@ -94,3 +94,8 @@ router['attachment'] = async (id, json, callback, args) => {
     sendAttachment(res, attachment.content);
     callback();
 };
+
+router['mark-unread'] = async (id, json, callback) => {
+    await mongo[0].collection(mailbox).updateOne({_id: ObjectId(json.id)}, {$set: {open: false}});
+    callback();
+};
