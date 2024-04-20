@@ -87,6 +87,6 @@ exports.checkMails = async function (path, length, session) {
 };
 
 exports.fileExists = async function (fileId, value) {
-    if (!c.gridfs) strictEqual(fs.existsSync(c.__dirname + fileId), value || true);
+    if (!c.gridfs) strictEqual(fs.existsSync(c.attachments + fileId), value || true);
     else strictEqual((await mongo[0 + "bucket"].find({_id: ObjectId(fileId)}).toArray()).length, value === undefined ? 1 : 0);
 };

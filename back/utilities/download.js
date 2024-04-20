@@ -20,7 +20,7 @@ module.exports.sendAttachment = (res, fileName) => {
         stream.on('error', () => res.end());
         stream.on('end', () => sendBuffer(res, Buffer.concat(chunks)))
     } else {
-        pipeStreamOverResponse(res, fs.createReadStream(co.__dirname + fileName), fs.statSync(co.__dirname + fileName).size);
+        pipeStreamOverResponse(res, fs.createReadStream(co.attachments + fileName), fs.statSync(co.attachments + fileName).size);
     }
 };
 

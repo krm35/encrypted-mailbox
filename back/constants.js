@@ -2,6 +2,7 @@ const fs = require('fs'),
     secret = __dirname + "/secrets.json",
     map = {};
 
+map.__dirname = __dirname;
 map.attachments = __dirname + "/attachments/";
 map.domain = "@localhost.com";
 map.domains = ["@localhost1.com"];
@@ -44,9 +45,7 @@ if (map.sendmailConf.dkim) {
     }
 }
 
-map.__dirname = map.attachments;
-
-if (!fs.existsSync(map.__dirname)) fs.mkdirSync(map.__dirname);
+if (!fs.existsSync(map.attachments)) fs.mkdirSync(map.attachments);
 
 map.domains.push(map.domain);
 

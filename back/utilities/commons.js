@@ -71,7 +71,7 @@ module.exports.saveAttachments = (parsed) => {
                 Readable.from(f.content).pipe(mongo[0 + "bucket"].openUploadStreamWithId(id))
             } else {
                 id = crypto.randomBytes(14).toString('hex');
-                fs.writeFileSync(co.__dirname + id, f.content);
+                fs.writeFileSync(co.attachments + id, f.content);
             }
             f.content = id.toString();
         });
@@ -88,7 +88,7 @@ module.exports.deleteMail = async (id, json, callback, collection, type, eventTy
     } else {
         for (const {content} of mail.attachments) {
             if (content.length === 24) await mongo[0 + "bucket"].delete(ObjectId(content));
-            else fs.unlinkSync(co.__dirname + content)
+            else fs.unlinkSync(co.attachments + content)
         }
     }
     await mongo[0].collection(collection).deleteOne({_id});
