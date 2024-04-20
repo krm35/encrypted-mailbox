@@ -226,7 +226,8 @@ export default function Panel(props) {
                                                     .catch(() => toast("Something went wrong :("))
                                             } outlined={true} icon={"trash"}/>
                                             &nbsp;
-                                            {doc.open !== false && <Button id={"mark-unread" + id} onClick={() =>
+                                            {tabId === "Mailbox" && doc.open !== false &&
+                                            <Button id={"mark-unread" + id} onClick={() =>
                                                 HTTPClient.post("/mark-unread", {id})
                                                     .then(() => {
                                                         document.getElementById("unread" + id).style.display = "";
