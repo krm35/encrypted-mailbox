@@ -13,7 +13,10 @@ export default function MailViewer(props) {
     return <Dialog
         title={mail.subject}
         isOpen={mail !== null}
-        onClose={() => setMail(null)}
+        onClose={() => {
+            mail.closed = true;
+            setMail(null);
+        }}
         style={{width: "60%"}}
     >
         <div className={Classes.DIALOG_BODY}>

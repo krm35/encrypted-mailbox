@@ -41,6 +41,10 @@ export function decryptMail(mail, setMail, type, setText, setAttachments) {
                 const parser = new PostalMime();
                 const email = await parser.parse(decrypted.replace(' \n\n ', '\n\n'));
                 const textAsHtml = email.html || (email.text ? replaceAll(email.text, "\n", "<br/>") : null);
+                if (mail?.closed) {
+                    delete mail.closed;
+                    return;
+                }
                 setMail({...mail, textAsHtml, attachments: email.attachments, decrypted});
                 if (setText) setText(email.html);
                 if (setAttachments) {

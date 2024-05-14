@@ -145,6 +145,7 @@ export default function MailViewer(props) {
             title={"Compose an email"}
             isOpen={true}
             onClose={() => {
+                if (props.mail) props.mail.closed = true;
                 if (subject?.length || text?.length) return setAlert(true);
                 if (props.setMail) props.setMail(null);
                 props.setCompose(null)
