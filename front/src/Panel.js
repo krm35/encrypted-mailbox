@@ -39,6 +39,7 @@ export default function Panel(props) {
         } else {
             if (json[0] === tabId && page === 1) {
                 setDocuments([json[1]].concat(window.documents));
+                window.documents.unshift(json[1]);
             }
         }
     };
