@@ -39,7 +39,7 @@ router['signin'] = async (id, json, callback) => {
 
 router['sign'] = async (id, json, callback, args) => {
     const {token, text} = json;
-    const {email, publicKey, admin} = JSON.parse(await redis.get("session" + token));
+    const {email, publicKey, admin} = JSON.parse(await redis.get("session" + token)) || {};
     await checkSignature(text, publicKey);
     await redis.set(email + "publicKey", publicKey);
     await generateCookie({email, admin}, callback, args);
