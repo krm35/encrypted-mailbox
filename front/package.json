@@ -11,37 +11,31 @@
     "file-saver": "^2.0.5",
     "nodemailer": "^6.9.0",
     "nodemailer-openpgp": "^2.1.0",
+    "openpgp": "^5.11.1",
     "path-browserify": "1.0.1",
     "postal-mime": "^1.0.13",
-    "react": "^17.0.1",
-    "react-dom": "^17.0.1",
-    "react-error-boundary": "^3.1.4",
-    "react-scripts": "4.0.3"
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "react-error-boundary": "^3.1.4"
+  },
+  "devDependencies": {
+    "@types/react": "^18.2.66",
+    "@types/react-dom": "^18.2.22",
+    "@vitejs/plugin-react": "^4.2.1",
+    "eslint": "^8.57.0",
+    "eslint-plugin-react": "^7.34.1",
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "eslint-plugin-react-refresh": "^0.4.6",
+    "vite": "^5.2.0",
+    "vite-plugin-node-polyfills": "^0.22.0"
   },
   "overrides": {
     "react-error-overlay": "6.0.9"
   },
   "scripts": {
-    "dev front": "react-scripts --openssl-legacy-provider start",
-    "start": "react-scripts start",
-    "build": "react-scripts --openssl-legacy-provider build"
-  },
-  "eslintConfig": {
-    "extends": [
-      "react-app",
-      "react-app/jest"
-    ]
-  },
-  "browserslist": {
-    "production": [
-      ">0.2%",
-      "not dead",
-      "not op_mini all"
-    ],
-    "development": [
-      "last 1 chrome version",
-      "last 1 firefox version",
-      "last 1 safari version"
-    ]
+    "dev front": "vite",
+    "build": "vite build",
+    "lint": "eslint . --ext js,jsx --report-unused-disable-directives --max-warnings 0",
+    "preview": "vite preview"
   }
 }

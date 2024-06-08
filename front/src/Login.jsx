@@ -5,7 +5,7 @@ import {HTTPClient} from "./HTTPClient";
 import {setKey, toast} from "./utilities";
 import {randomBytes} from "crypto";
 
-const {
+import {
     createCleartextMessage,
     createMessage,
     decrypt,
@@ -16,7 +16,20 @@ const {
     readMessage,
     readPrivateKey,
     sign
-} = window.openpgp;
+} from 'openpgp';
+
+// const {
+//     createCleartextMessage,
+//     createMessage,
+//     decrypt,
+//     decryptKey,
+//     encrypt,
+//     generateKey,
+//     readKey,
+//     readMessage,
+//     readPrivateKey,
+//     sign
+// } = window.openpgp;
 
 export default function Login(props) {
 
@@ -30,9 +43,10 @@ export default function Login(props) {
                 if (!document.getElementById("password").value.length || !props.autologin) return;
                 document.getElementById("sign-in")?.click();
             } catch (e) {
+                console.log(e);
             }
         }, 1000);
-    }, []);
+    }, [props.autologin]);
 
     async function signUp() {
         setLoader("signup");

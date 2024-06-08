@@ -258,4 +258,4 @@ export default function Panel(props) {
             {credentials && <Credentials setCredentials={setCredentials}/>}
         </div>
     )
-};
+}

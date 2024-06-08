@@ -3,7 +3,9 @@ import {FocusStyleManager} from "@blueprintjs/core";
 import PostalMime from "postal-mime";
 import {HTTPClient} from "./HTTPClient";
 
-const {decrypt, readMessage} = window.openpgp;
+import {decrypt, readMessage} from 'openpgp';
+
+// const {decrypt, readMessage} = window.openpgp;
 
 const keys = {};
 
@@ -87,7 +89,7 @@ export function initWS() {
         }
     };
 
-    ws.onerror = function (e) {
+    ws.onerror = function () {
     };
 
     ws.onclose = function () {

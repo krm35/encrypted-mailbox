@@ -2,11 +2,11 @@ import React, {useEffect, useState} from "react";
 import {Button, Dialog, EditableText, FileInput, Icon, MenuDivider, Tag} from "@blueprintjs/core";
 import * as Classes from "@blueprintjs/core/lib/cjs/common/classes";
 import MailComposer from "nodemailer/lib/mail-composer";
-import {Encrypter} from "nodemailer-openpgp";
+// import {Encrypter} from "nodemailer-openpgp";
 import {HTTPClient} from "./HTTPClient";
 import {arrayBufferToBuffer, decryptMail, getKey, replaceAll, toast} from "./utilities";
 import KeyViewer from "./KeyViewer";
-import {detectMimeType} from "./mime-types";
+import mimeTypes from "./mime-types";
 import FileSaver from 'file-saver';
 import DraftAlert from "./DraftAlert";
 
@@ -53,18 +53,18 @@ export default function MailViewer(props) {
 
     function encrypt(message, encryptionKeys) {
         if (!encryptionKeys) return message;
-        return new Promise((resolve, reject) => {
-            try {
-                const chunks = [];
-                const signer = new Encrypter({encryptionKeys});
-                signer.on('data', chunk => chunks.push(chunk));
-                signer.on('err', err => reject(err));
-                signer.on('end', () => resolve(Buffer.concat(chunks).toString('utf-8')));
-                signer.end(message);
-            } catch (e) {
-                reject(e);
-            }
-        });
+        // return new Promise((resolve, reject) => {
+        //     try {
+        //         const chunks = [];
+        //         const signer = new Encrypter({encryptionKeys});
+        //         signer.on('data', chunk => chunks.push(chunk));
+        //         signer.on('err', err => reject(err));
+        //         signer.on('end', () => resolve(Buffer.concat(chunks).toString('utf-8')));
+        //         signer.end(message);
+        //     } catch (e) {
+        //         reject(e);
+        //     }
+        // });
     }
 
     function saveDraft() {
@@ -79,6 +79,7 @@ export default function MailViewer(props) {
             props.setMail(null);
             props.setCompose(null);
         } catch (e) {
+            console.log(e);
         }
     }
 
@@ -94,7 +95,7 @@ export default function MailViewer(props) {
             attachments: Array.from(attachments).filter(a => {
                 if (!a.contentType) {
                     a.content = arrayBufferToBuffer(a.content);
-                    a.contentType = detectMimeType(a.filename);
+                    a.contentType = mimeTypes.detectMimeType(a.filename);
                 }
                 return a.valid !== null
             })
@@ -185,7 +186,7 @@ export default function MailViewer(props) {
                             round={true}
                             icon={<Icon
                                 icon={"floppy-disk"}
-                                onClick={() => FileSaver['saveAs'](new Blob([a.content], {type: detectMimeType(a.filename)}), a.filename)}
+                                onClick={() => FileSaver['saveAs'](new Blob([a.content], {type: mimeTypes.detectMimeType(a.filename)}), a.filename)}
                             />}
                             onRemove={() => {
                                 attachments[i].valid = null;
@@ -205,7 +206,7 @@ export default function MailViewer(props) {
                                     attachments.push({
                                         filename: files[f].name,
                                         content: arrayBufferToBuffer(reader.result),
-                                        contentType: detectMimeType(files[f].name)
+                                        contentType: mimeTypes.detectMimeType(files[f].name)
                                     });
                                     setAttachments([...attachments]);
                                 }, false);
@@ -232,7 +233,7 @@ export default function MailViewer(props) {
                             attachments.push({
                                 filename,
                                 content: new TextEncoder().encode(getKey("armoredPublicKey")),
-                                contentType: detectMimeType(filename)
+                                contentType: mimeTypes.detectMimeType(filename)
                             });
                             setAttachments([...attachments]);
                         }}

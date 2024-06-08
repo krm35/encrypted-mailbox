@@ -4,7 +4,7 @@ import * as Classes from "@blueprintjs/core/lib/cjs/common/classes";
 import DOMPurify from 'dompurify'
 import {decryptMail, replaceAll} from "./utilities";
 import FileSaver from 'file-saver';
-import {detectMimeType} from "./mime-types";
+import mimeTypes from "./mime-types";
 
 export default function MailViewer(props) {
     const {mail, setMail, setCompose, tabId} = props;
@@ -49,7 +49,7 @@ export default function MailViewer(props) {
                     key={i}
                     round={true}
                     icon={"floppy-disk"}
-                    onClick={() => FileSaver['saveAs'](new Blob([a.content], {type: detectMimeType(a.filename)}), a.filename)}
+                    onClick={() => FileSaver['saveAs'](new Blob([a.content], {type: mimeTypes.detectMimeType(a.filename)}), a.filename)}
                 >
                     {a.filename}
                 </Tag>
@@ -84,7 +84,7 @@ export default function MailViewer(props) {
     </Dialog>
 }
 
-const urlRegex = /(\b(https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/ig;
+const urlRegex = /(\b(https?|ftp|file):\/\/[-A-Z0-9+&@#/%?=~_|!:,.;]*[-A-Z0-9+&@#/%=~_|])/ig;
 
 function linkify(text) {
     if (text.includes('href=')) return text;
