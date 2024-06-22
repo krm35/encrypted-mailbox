@@ -136,7 +136,7 @@ export default function Panel(props) {
                         setPage(1);
                         setFilter({...filter, search: target.value});
                     }}
-                    rightElement={filter?.search?.length && <Button
+                    rightElement={filter?.search?.length > 0 && <Button
                         icon={"cross"}
                         minimal={true}
                         onClick={() => {
