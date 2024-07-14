@@ -96,6 +96,7 @@ export default function MailViewer(props) {
                     a.content = arrayBufferToBuffer(a.content);
                     a.contentType = detectMimeType(a.filename);
                 }
+                if (a.contentType === "text/plain") a.contentType = "application/octet-stream";
                 return a.valid !== null
             })
         });
