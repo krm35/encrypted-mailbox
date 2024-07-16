@@ -6,7 +6,6 @@ import {Encrypter} from "nodemailer-openpgp";
 import {HTTPClient} from "./HTTPClient";
 import {arrayBufferToBuffer, decryptMail, getKey, replaceAll, toast} from "./utilities";
 import KeyViewer from "./KeyViewer";
-import {detectMimeType} from "./mime-types";
 import FileSaver from 'file-saver';
 import DraftAlert from "./DraftAlert";
 
@@ -92,11 +91,8 @@ export default function MailViewer(props) {
             subject,
             html: draft ? text : replaceAll(text, "\n", "<br/>"),
             attachments: Array.from(attachments).filter(a => {
-                if (!a.contentType) {
-                    a.content = arrayBufferToBuffer(a.content);
-                    a.contentType = detectMimeType(a.filename);
-                }
-                if (a.contentType === "text/plain") a.contentType = "application/octet-stream";
+                if (!a.contentType) a.content = arrayBufferToBuffer(a.content);
+                a.contentType = "application/octet-stream";
                 return a.valid !== null
             })
         });
@@ -186,7 +182,7 @@ export default function MailViewer(props) {
                             round={true}
                             icon={<Icon
                                 icon={"floppy-disk"}
-                                onClick={() => FileSaver['saveAs'](new Blob([a.content], {type: detectMimeType(a.filename)}), a.filename)}
+                                onClick={() => FileSaver['saveAs'](new Blob([a.content], {type: "application/octet-stream"}), a.filename)}
                             />}
                             onRemove={() => {
                                 attachments[i].valid = null;
@@ -206,7 +202,7 @@ export default function MailViewer(props) {
                                     attachments.push({
                                         filename: files[f].name,
                                         content: arrayBufferToBuffer(reader.result),
-                                        contentType: detectMimeType(files[f].name)
+                                        contentType: "application/octet-stream"
                                     });
                                     setAttachments([...attachments]);
                                 }, false);
@@ -233,7 +229,7 @@ export default function MailViewer(props) {
                             attachments.push({
                                 filename,
                                 content: new TextEncoder().encode(getKey("armoredPublicKey")),
-                                contentType: detectMimeType(filename)
+                                contentType: "application/octet-stream"
                             });
                             setAttachments([...attachments]);
                         }}

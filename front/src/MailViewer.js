@@ -4,7 +4,6 @@ import * as Classes from "@blueprintjs/core/lib/cjs/common/classes";
 import DOMPurify from 'dompurify'
 import {decryptMail, replaceAll} from "./utilities";
 import FileSaver from 'file-saver';
-import {detectMimeType} from "./mime-types";
 
 export default function MailViewer(props) {
     const {mail, setMail, setCompose, tabId} = props;
@@ -49,7 +48,7 @@ export default function MailViewer(props) {
                     key={i}
                     round={true}
                     icon={"floppy-disk"}
-                    onClick={() => FileSaver['saveAs'](new Blob([a.content], {type: detectMimeType(a.filename)}), a.filename)}
+                    onClick={() => FileSaver['saveAs'](new Blob([a.content], {type: "application/octet-stream"}), a.filename)}
                 >
                     {a.filename}
                 </Tag>

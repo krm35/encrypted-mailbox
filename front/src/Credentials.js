@@ -4,7 +4,6 @@ import * as Classes from "@blueprintjs/core/lib/cjs/common/classes";
 import {HTTPClient} from "./HTTPClient";
 import {getKey, setKey, toast} from "./utilities";
 import FileSaver from "file-saver";
-import {detectMimeType} from "./mime-types";
 
 const {createMessage, decrypt, encrypt, readMessage} = window.openpgp;
 
@@ -53,7 +52,7 @@ export default function Credentials(props) {
     }
 
     function save(key, filename) {
-        FileSaver['saveAs'](new Blob([key], {type: detectMimeType(filename)}), filename)
+        FileSaver['saveAs'](new Blob([key], {type: "application/octet-stream"}), filename)
     }
 
     return <Dialog
